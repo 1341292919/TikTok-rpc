@@ -10,5 +10,6 @@ func main() {
 	h := server.Default()
 
 	register(h)
+
 	h.Spin()
 }
