@@ -1,4 +1,4 @@
-namespace go video
+namespace go api.video
 
 include"model.thrift"
 //上传视频
