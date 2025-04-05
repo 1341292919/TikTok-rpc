@@ -9,12 +9,13 @@ struct RegisterRequest{
 
 struct RegisterResponse{
     1: model.BaseResp base,
+    2: required i64 user_id,
 }
 //登录
 struct LoginRequest{
     1: required string username
     2: required string password,
-    3:optional string code ,
+    3: optional string code ,
 }
 
 struct LoginResponse{
@@ -34,7 +35,7 @@ struct SearchImagesResponse{
 
 //上传头像
 struct UploadAvatarRequest{
-     1: binary data ,
+      1:required string avatar_url,
       2:required i64 user_id,
 }
 struct UploadAvatarResponse{

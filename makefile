@@ -1,5 +1,7 @@
 MODULE = TikTok-rpc
 
+DIR = $(shell pwd)
+IDL_PATH = $(DIR)/idl
 
 .PHONY:target
 target:
@@ -10,13 +12,9 @@ target:
 newHz:
 	hz new -module $(MODULE)
 
-.PHONY: genHz
-genHz:
-	hz update -idl ./idl/api/interact.thrift
-	hz update -idl ./idl/api/socialize.thrift
-	hz update -idl ./idl/api/user.thrift
-	hz update -idl ./idl/api/video.thrift
-	hz update -idl ./idl/api/model.thrift
+.PHONY: hz-%
+hz-%:
+	hz update -idl ${IDL_PATH}/api/$*.thrift
 
 .PHONY: genKt
 genKt:
@@ -30,14 +28,16 @@ genKt:
 	mkdir rpc/video
 	mkdir rpc/interact
 	mkdir rpc/socialize
-	cd rpc/user
-	kitex -module $(MODULE) -service user ../../idl/user.thrift
-	cd ..
-	cd video
-	kitex -module $(MODULE) -service video ../../idl/video.thrift
-	cd ..
-	cd interact
-	kitex -module $(MODULE) -service interact ../../idl/interact.thrift
-	cd ..
-	cd socialize
-	kitex -module $(MODULE) -service socialize ../../idl/socialize.thrift
+	cd rpc/user && kitex -module $(MODULE) -thrift no_default_serdes -service user ${IDL_PATH}/user.thrift && \
+	cd ../video && kitex -module $(MODULE) -thrift no_default_serdes -service video ${IDL_PATH}/video.thrift && \
+	cd ../interact && kitex -module $(MODULE) -thrift no_default_serdes -service interact ${IDL_PATH}/interact.thrift && \
+	cd ../socialize && kitex -module $(MODULE) -thrift no_default_serdes -service socialize ${IDL_PATH}/socialize.thrift
+
+.PHONY: kit
+kit:
+		kitex -thrift no_default_serdes idl/model.thrift
+		kitex -thrift no_default_serdes idl/user.thrift
+		kitex idl/video.thrift
+		kitex idl/interact.thrift
+		kitex idl/socialize.thrift
+

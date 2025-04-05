@@ -3,7 +3,7 @@
 package main
 
 import (
-	"TikTok-rpc/app/gateway/biz/router"
+	"TikTok-rpc/app/gateway/router"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

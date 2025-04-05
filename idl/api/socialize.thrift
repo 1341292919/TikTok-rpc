@@ -1,4 +1,4 @@
-namespace go socialize
+namespace go api.socialize
 
 include "model.thrift"
 
