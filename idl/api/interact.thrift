@@ -1,6 +1,7 @@
-namespace go interact
+namespace go api.interact
 
 include "model.thrift"
+
 //点赞
 struct LikeRequest{
     //两者必须存在其一
