@@ -2130,7 +2130,7 @@ func (p *GetMFAResponse) String() string {
 
 // 绑定多因素身份认证(MFA)
 type MFABindRequest struct {
-	Code   string `thrift:"code,1,required" form:"qcode,required" json:"code,required"`
+	Code   string `thrift:"code,1,required" form:"code,required" json:"code,required"`
 	Secret string `thrift:"secret,2,required" form:"secret,required" json:"secret,required"`
 }
 

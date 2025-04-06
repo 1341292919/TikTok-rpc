@@ -2,43 +2,43 @@ package usecase
 
 import (
 	"TikTok-rpc/app/user/domain/model"
-	"TikTok-rpc/app/user/domain/service"
-	"TikTok-rpc/pkg/crypt"
 	"TikTok-rpc/pkg/errno"
 	"context"
 	"fmt"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
+
+//所有service层出现的错误都应该正确由errno封装
+//由于并没有对用户名和密码作要求所以省略了部分的参数检验
 
 func (uc *useCase) RegisterUser(ctx context.Context, u *model.User) (uid int64, err error) {
 	//这边应该完成用户注册的几个步骤 1.参数检验、2.用户存在检验、3.密码哈希、4.db create new user
 	exist, err := uc.db.IsUserExist(ctx, u)
-
 	if err != nil {
 		return 0, fmt.Errorf("check user exist failed: %w", err)
 	}
 	if exist {
-		return 0, errno.NewErrNo(errno.ServiceUserExist, "user already exist")
+		return 0, errno.NewErrNo(errno.ServiceUserExistCode, "user already exist")
 	}
-	u.Password, err = crypt.PasswordHash(u.Password)
+	u.Password, err = uc.svc.PasswordHash(u.Password)
 	if err != nil {
 		return 0, fmt.Errorf("hash password failed: %w", err)
 	}
-	uid, err = uc.db.CreateUser(ctx, u)
+	uid, err = uc.svc.CreateUser(ctx, u)
 	if err != nil {
 		return 0, fmt.Errorf("create user failed: %w", err)
 	}
 	return uid, nil
 }
 
+// 登录应该完成的几个步骤 1.参数检验、2.用户存在检验、3密码检验 4.MFA
 func (uc *useCase) Login(ctx context.Context, user *model.User) (*model.User, error) {
-	//登录应该完成的几个步骤 1.参数检验、2.用户存在检验、3密码检验 4.MFA
+	//用户存在检验
 	exist, err := uc.db.IsUserExist(ctx, user)
 	if err != nil {
 		return nil, fmt.Errorf("check user exist failed: %w", err)
 	}
 	if !exist {
-		return nil, errno.NewErrNo(errno.ServiceUserExist, "user not exist")
+		return nil, errno.NewErrNo(errno.ServiceUserNotExistCode, "user not exist")
 	}
 	var u *model.User
 	u, err = uc.db.GetUserInfo(ctx, user)
@@ -46,37 +46,49 @@ func (uc *useCase) Login(ctx context.Context, user *model.User) (*model.User, er
 		return nil, fmt.Errorf("get user Info failed: %w", err)
 	}
 	//密码检验
-	if !crypt.VerifyPassword(user.Password, u.Password) {
+	if !uc.svc.PasswordVerify(user.Password, u.Password) {
 		return nil, errno.Errorf(errno.ServiceUserPasswordError, "password not match")
 	}
-	//事实上这边错误应该分为两种-1.不合规的code 2.code不符
-	if u.OptSecret != "" {
-		flag := service.TotpValidate(user.Code, u.OptSecret)
+	//以下三次调用应该合并吗？
+	check, err := uc.svc.IsRequiredMFA(ctx, u)
+	if err != nil {
+		return nil, fmt.Errorf("check MFA required failed: %w", err)
+	}
+	if check {
+		//对code的存在进行检验
+		if err = uc.svc.Verify(uc.svc.VerifyMFACode(user.Code)); err != nil {
+			return nil, err
+		}
+		//code匹配与否
+		flag, err := uc.svc.MFACheck(ctx, user)
+		if err != nil {
+			return nil, fmt.Errorf("check MFA required failed: %w", err)
+		}
 		if !flag {
-			return nil, errno.NewErrNo(errno.ServiceUserExist, "invaild MFA code")
+			return nil, errno.NewErrNo(errno.ParamLogicalErrorCode, "invaild MFA code")
 		}
 	}
 	return u, nil
 }
+
 func (uc *useCase) UploadAvatar(ctx context.Context, user *model.User) (*model.User, error) {
-	//1.参数检验、
-	u, err := uc.db.UpdateUser(ctx, user)
-	hlog.Info(user.AvatarUrl)
+	u, err := uc.svc.UploadAvatar(ctx, user)
 	if err != nil {
 		return nil, fmt.Errorf("update user failed: %w", err)
 	}
 	return u, nil
 }
+
 func (uc *useCase) GetUserInfo(ctx context.Context, user *model.User) (*model.User, error) {
 	exist, err := uc.db.IsUserExist(ctx, user)
 	if err != nil {
 		return nil, fmt.Errorf("check user exist failed: %w", err)
 	}
 	if !exist {
-		return nil, errno.NewErrNo(errno.ServiceUserExist, "user not exist")
+		return nil, errno.NewErrNo(errno.ServiceUserNotExistCode, "user not exist")
 	}
 	var u *model.User
-	u, err = uc.db.GetUserInfo(ctx, user)
+	u, err = uc.svc.GetUserInfoById(ctx, user)
 	if err != nil {
 		return nil, fmt.Errorf("get user Info failed: %w", err)
 	}
@@ -84,12 +96,12 @@ func (uc *useCase) GetUserInfo(ctx context.Context, user *model.User) (*model.Us
 }
 
 func (uc *useCase) GetMFACode(ctx context.Context, user *model.User) (*model.MFA, error) {
-	//还应该有一层检验是否已经绑定了？
-	userData, err := uc.GetUserInfo(ctx, user)
+
+	userData, err := uc.svc.GetUserInfoById(ctx, user)
 	if err != nil {
 		return nil, fmt.Errorf("check user meassage failed: %w", err)
 	}
-	MFA, err := service.OptSecret(userData)
+	MFA, err := uc.svc.GetMFAQCode(ctx, userData)
 	if err != nil {
 		return nil, fmt.Errorf("generate mfa meassage failed: %w", err)
 	}
@@ -97,17 +109,16 @@ func (uc *useCase) GetMFACode(ctx context.Context, user *model.User) (*model.MFA
 }
 
 func (uc *useCase) MFABind(ctx context.Context, user *model.User, code, secret string) error {
-	//检验code与secret
 	//我们是不是应该检验传入的code，secret与用户id是否匹配？
-	flag := service.TotpValidate(code, secret)
+	flag := uc.svc.TotpValidate(code, secret)
 	if !flag {
-		return errno.NewErrNo(errno.ServiceUserExist, "Invalid code and secret")
+		return errno.NewErrNo(errno.InternalServiceErrorCode, "Invalid code and secret")
 	}
 	MFA := &model.MFAMessage{
 		Secret: secret,
 		Status: 1,
 	}
-	err := uc.db.UpdateMFA(ctx, user, MFA)
+	err := uc.svc.UpdateMFA(ctx, user, MFA)
 	if err != nil {
 		return err
 	}

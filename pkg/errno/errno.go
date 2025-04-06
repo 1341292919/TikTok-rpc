@@ -3,13 +3,11 @@ package errno
 import (
 	"errors"
 	"fmt"
-	"io"
 )
 
 type ErrNo struct {
 	ErrorCode int64
 	ErrorMsg  string
-	stack     *stack
 }
 
 func NewErrNo(code int64, msg string) ErrNo {
@@ -29,7 +27,6 @@ func NewErrNoWithStack(code int64, msg string) ErrNo {
 	return ErrNo{
 		ErrorCode: code,
 		ErrorMsg:  msg,
-		stack:     callers(),
 	}
 }
 
@@ -39,7 +36,6 @@ func Errorf(code int64, template string, args ...interface{}) ErrNo {
 	return ErrNo{
 		ErrorCode: code,
 		ErrorMsg:  fmt.Sprintf(template, args...),
-		stack:     callers(),
 	}
 }
 
@@ -50,19 +46,6 @@ func (e ErrNo) WithMessage(message string) ErrNo {
 func (e ErrNo) WithError(err error) ErrNo {
 	e.ErrorMsg = err.Error()
 	return e
-}
-
-func (e ErrNo) Format(s fmt.State, verb rune) {
-	switch verb {
-	case 's':
-		io.WriteString(s, e.Error())
-	case 'd':
-		io.WriteString(s, e.Error())
-		switch {
-		case s.Flag('+'):
-			e.stack.Format(s, verb)
-		}
-	}
 }
 
 func ConvertErr(err error) ErrNo {

@@ -10,6 +10,8 @@ type User struct {
 	Username  string
 	Password  string
 	AvatarUrl string
+	OptSecret string
+	MfaStatus int64
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`

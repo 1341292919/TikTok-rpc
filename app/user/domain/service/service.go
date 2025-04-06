@@ -2,60 +2,49 @@ package service
 
 import (
 	"TikTok-rpc/app/user/domain/model"
-	"TikTok-rpc/pkg/utils"
-	"bytes"
-	"encoding/base64"
-	"github.com/pquerna/otp"
-	"github.com/pquerna/otp/totp"
-	"image/png"
+	"context"
 )
 
-func OptSecret(user *model.User) (*model.MFA, error) {
-	var MFA = &model.MFA{}
-	var buf bytes.Buffer
-
-	if user.OptSecret == "" {
-		key, err := totp.Generate(totp.GenerateOpts{
-			Issuer:      "tiktok",
-			AccountName: user.UserName,
-			Period:      30,
-			Digits:      otp.DigitsSix,
-			SecretSize:  20,
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		user.OptSecret = key.String()
-	}
-	//生成二维码
-	key, err := otp.NewKeyFromURL(user.OptSecret)
-	if err != nil {
-		return nil, err
-	}
-
-	img, err := key.Image(200, 200)
-	if err != nil {
-		return nil, err
-	}
-
-	err = png.Encode(&buf, img)
-	if err != nil {
-		return nil, err
-	}
-
-	qrcode := base64.StdEncoding.EncodeToString(buf.Bytes())
-
-	secret, err := utils.ExtractSecretFromTOTPURL(user.OptSecret)
-	if err != nil {
-		return nil, err
-	}
-
-	MFA.Secret = secret
-	MFA.Qrcode = qrcode
-	return MFA, nil
+func (svc *UserService) CreateUser(ctx context.Context, user *model.User) (int64, error) {
+	return svc.db.CreateUser(ctx, user)
 }
 
-func TotpValidate(code, secret string) bool {
-	return totp.Validate(code, secret)
+func (svc *UserService) IsRequiredMFA(ctx context.Context, user *model.User) (bool, error) {
+	MFAMessage, err := svc.db.CheckMFA(ctx, user)
+	if err != nil {
+		return false, err
+	}
+	if MFAMessage.Secret == "" && MFAMessage.Status == 0 {
+		return false, nil
+	}
+	return true, nil
+}
+func (svc *UserService) GetMFAQCode(ctx context.Context, user *model.User) (*model.MFA, error) {
+	MFAMessage, err := svc.db.CheckMFA(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+	MFA, err := svc.OptSecret(user.UserName, MFAMessage)
+	if err != nil {
+		return nil, err
+	}
+	return MFA, nil
+}
+func (svc *UserService) MFACheck(ctx context.Context, user *model.User) (bool, error) {
+	MFAMessage, err := svc.db.CheckMFA(ctx, user)
+	if err != nil {
+		return false, err
+	}
+	return svc.TotpValidate(user.Code, MFAMessage.Secret), nil
+
+}
+func (svc *UserService) UploadAvatar(ctx context.Context, user *model.User) (*model.User, error) {
+	return svc.db.UpdateUser(ctx, user)
+}
+func (svc *UserService) GetUserInfoById(ctx context.Context, user *model.User) (*model.User, error) {
+	return svc.db.GetUserInfo(ctx, user)
+}
+
+func (svc *UserService) UpdateMFA(ctx context.Context, user *model.User, mfa *model.MFAMessage) error {
+	return svc.db.UpdateMFA(ctx, user, mfa)
 }

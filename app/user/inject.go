@@ -2,6 +2,7 @@ package user
 
 import (
 	"TikTok-rpc/app/user/controllers/rpc"
+	"TikTok-rpc/app/user/domain/service"
 	"TikTok-rpc/app/user/infrastructure/mysql"
 	"TikTok-rpc/app/user/usecase"
 	"TikTok-rpc/kitex_gen/user"
@@ -13,6 +14,7 @@ func InjectUserHandler() user.UserService {
 		panic(err)
 	}
 	db := mysql.NewUserDB(gormDB)
-	uc := usecase.NewUserCase(db)
+	svc := service.NewUserService(db)
+	uc := usecase.NewUserCase(db, svc)
 	return rpc.NewUserServiceImpl(uc)
 }

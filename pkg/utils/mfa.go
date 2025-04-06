@@ -2,6 +2,8 @@ package utils
 
 import (
 	"errors"
+	"fmt"
+	"github.com/pquerna/otp"
 	"net/url"
 )
 
@@ -21,4 +23,11 @@ func ExtractSecretFromTOTPURL(totpURL string) (string, error) {
 	}
 
 	return secret, nil
+}
+func ExtractUidFromOTPURL(otpURL string) (string, error) {
+	key, err := otp.NewKeyFromURL(otpURL)
+	if err != nil {
+		return "", fmt.Errorf("invalid OTP URL: %v", err)
+	}
+	return key.AccountName(), nil // 返回 Uid
 }

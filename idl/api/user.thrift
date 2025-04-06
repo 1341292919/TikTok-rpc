@@ -58,7 +58,7 @@ struct GetMFAResponse{
 }
 //绑定多因素身份认证(MFA)
 struct MFABindRequest{
-    1:required string code (api.form="qcode"),
+    1:required string code (api.form="code"),
     2:required string secret (api.form="secret"),
 }
 

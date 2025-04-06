@@ -126,25 +126,32 @@ func (db *userDB) UpdateUser(ctx context.Context, user *model.User) (*model.User
 }
 
 func (db *userDB) UpdateMFA(ctx context.Context, user *model.User, mfa *model.MFAMessage) error {
-	if mfa != nil {
-		err := db.client.WithContext(ctx).
-			Table(constants.TableUser).
-			Where("BINARY id = ?", user.Uid).
-			Update("opt_secret", mfa.Secret).
-			Error
-		if err != nil {
-			return err
-		}
-		return nil
-	} else {
-		err := db.client.WithContext(ctx).
-			Table(constants.TableUser).
-			Where("BINARY id = ?", user.Uid).
-			Update("mfa_status", mfa.Status).
-			Error
-		if err != nil {
-			return err
-		}
-		return nil
+	err := db.client.WithContext(ctx).
+		Table(constants.TableUser).
+		Where("BINARY id = ?", user.Uid).
+		Update("opt_secret", mfa.Secret).
+		Update("mfa_status", mfa.Status).
+		Error
+	if err != nil {
+		return err
 	}
+
+	return nil
+}
+
+func (db *userDB) CheckMFA(ctx context.Context, user *model.User) (*model.MFAMessage, error) {
+	var userResp *User
+	err := db.client.WithContext(ctx).
+		Table(constants.TableUser).
+		Where("BINARY id = ?", user.Uid).
+		Find(&userResp).
+		Error
+	if err != nil {
+		return nil, err
+	}
+	return &model.MFAMessage{
+		Secret: userResp.OptSecret,
+		Status: userResp.MfaStatus,
+	}, nil
+
 }
