@@ -21,7 +21,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	var req api.RegisterRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.SendFailResponse(c, errno.ConvertErr(err))
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
 		return
 	}
 	resp := new(api.RegisterResponse)
@@ -45,7 +45,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	var req api.LoginRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.SendFailResponse(c, errno.ConvertErr(err))
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
 		return
 	}
 
@@ -77,12 +77,12 @@ func UploadAvatar(ctx context.Context, c *app.RequestContext) {
 	var req api.UploadAvatarRequest
 	data, err := c.FormFile("data")
 	if err != nil {
-		pack.SendFailResponse(c, errno.ConvertErr(err))
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, "required file but found not "))
 		return
 	}
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.SendFailResponse(c, errno.ConvertErr(err))
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
 		return
 	}
 	userId := service.GetUserIDFromContext(c)
@@ -113,7 +113,7 @@ func GetInformation(ctx context.Context, c *app.RequestContext) {
 	var req api.GetUserInformationRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.SendFailResponse(c, errno.ConvertErr(err))
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
 		return
 	}
 	resp := new(api.GetUserInformationResponse)
@@ -152,7 +152,7 @@ func GetMFA(ctx context.Context, c *app.RequestContext) {
 	var req api.GetMFARequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.SendFailResponse(c, errno.ConvertErr(err))
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
 		return
 	}
 
@@ -176,7 +176,7 @@ func MindBind(ctx context.Context, c *app.RequestContext) {
 	var req api.MFABindRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.SendFailResponse(c, errno.ConvertErr(err))
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
 		return
 	}
 
