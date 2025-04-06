@@ -2,6 +2,7 @@ package service
 
 import (
 	"TikTok-rpc/pkg/constants"
+	"TikTok-rpc/pkg/errno"
 	"fmt"
 	"github.com/cloudwego/hertz/pkg/app"
 )
@@ -10,7 +11,7 @@ func GetUserIDFromContext(c *app.RequestContext) int64 {
 	data := c.Keys[constants.ContextUserId]
 	uid, err := convertToInt64(data)
 	if err != nil {
-		panic(err)
+		panic(errno.UserIdMissingError)
 	}
 	return uid
 }

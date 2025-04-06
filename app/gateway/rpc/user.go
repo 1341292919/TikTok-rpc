@@ -10,7 +10,6 @@ import (
 	"TikTok-rpc/pkg/utils"
 	"context"
 	"github.com/bytedance/gopkg/util/logger"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
 
 func InitUserRPC() {
@@ -25,7 +24,6 @@ func InitUserRPC() {
 // 传入的是rpc的请求,应该返回hz的Resp
 // 由于只要求返回Base
 func RegisterRPC(ctx context.Context, req *user.RegisterRequest) error {
-	hlog.Info(*req)
 	resp, err := userClient.Register(ctx, req)
 	if err != nil {
 		logger.Errorf("LoginRPC: RPC called failed: %v", err.Error())
@@ -46,7 +44,7 @@ func LoginRPC(ctx context.Context, req *user.LoginRequest) (*api.LoginResponse, 
 		return nil, errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsRPCSuccess(resp.Base) { // 将其标注为服务错误，那么如果是数据库错误呢
-		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
 	//对数据进行封装
 	apiResp.Data = pack.User(resp.Data)
@@ -77,7 +75,7 @@ func UploadAvatarRPC(ctx context.Context, req *user.UploadAvatarRequest) (*api.U
 		return nil, errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsRPCSuccess(resp.Base) {
-		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
 	apiResp.Data = pack.User(resp.Data)
 	return apiResp, nil
@@ -92,7 +90,7 @@ func GetUserMessagesRPC(ctx context.Context, req *user.GetUserInformationRequest
 		return nil, errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsRPCSuccess(resp.Base) {
-		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
 	apiResp.Data = pack.User(resp.Data)
 	return apiResp, nil
@@ -107,7 +105,7 @@ func GetQrcodeRPC(ctx context.Context, req *user.GetMFARequest) (*api.GetMFAResp
 		return nil, errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsRPCSuccess(resp.Base) {
-		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
 	apiResp = &api.GetMFAResponse{
 		Data: &apiModel.MFAMessage{
@@ -127,7 +125,7 @@ func MFABindRPC(ctx context.Context, req *user.MFABindRequest) (*api.MFABindResp
 		return nil, errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsRPCSuccess(resp.Base) {
-		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
 	return apiResp, nil
 }

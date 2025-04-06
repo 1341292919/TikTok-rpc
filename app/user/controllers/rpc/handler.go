@@ -43,6 +43,7 @@ func (s *UserServiceImpl) Register(ctx context.Context, req *user.RegisterReques
 func (s *UserServiceImpl) Login(ctx context.Context, req *user.LoginRequest) (resp *user.LoginResponse, err error) {
 	resp = new(user.LoginResponse)
 	u := new(model.User)
+	//实际上这边code应该放到service检验 但是空指针报错？
 	if req.Code == nil {
 		u = &model.User{
 			UserName: req.Username,

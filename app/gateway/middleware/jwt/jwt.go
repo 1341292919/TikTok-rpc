@@ -139,29 +139,29 @@ func RefreshTokenJwt() {
 	}
 }
 
-func IsAccessTokenAvailable(ctx context.Context, c *app.RequestContext) bool {
+func IsAccessTokenAvailable(ctx context.Context, c *app.RequestContext) error {
 	claims, err := AccessTokenJwtMiddleware.GetClaimsFromJWT(ctx, c)
 	if err != nil {
-		return false
+		return errno.AuthNoToken
 	}
-	//JWT 的 Claims 中通常包含一个 exp 字段，表示 Token 的过期时间（Unix 时间戳）。
+
 	switch v := claims["exp"].(type) { //switch-case处理解析出来的时间类型并与当前时间做比较
 	case nil:
-		return false
+		return errno.AuthNoToken
 	case float64:
 		if int64(v) < AccessTokenJwtMiddleware.TimeFunc().Unix() {
-			return false
+			return errno.AuthAccessExpired
 		}
 	case json.Number:
 		n, err := v.Int64()
 		if err != nil {
-			return false
+			return errno.NewErrNo(errno.InternalServiceErrorCode, "Token parse error")
 		}
 		if n < AccessTokenJwtMiddleware.TimeFunc().Unix() {
-			return false
+			return errno.AuthAccessExpired
 		}
 	default:
-		return false
+		return errno.NewErrNo(errno.InternalServiceErrorCode, "Token parse error")
 	}
 	c.Set("JWT_PAYLOAD", claims) //将令牌存入上下文
 	identity := AccessTokenJwtMiddleware.IdentityHandler(ctx, c)
@@ -170,36 +170,36 @@ func IsAccessTokenAvailable(ctx context.Context, c *app.RequestContext) bool {
 		c.Set(AccessTokenJwtMiddleware.IdentityKey, identity) //将用户id解析出存入上下文
 	}
 	if !AccessTokenJwtMiddleware.Authorizator(identity, ctx, c) { //
-		return false
+		return errno.AuthInvalid
 	}
 
-	return true
+	return nil
 
 }
 
-func IsRefreshTokenAvailable(ctx context.Context, c *app.RequestContext) bool {
+func IsRefreshTokenAvailable(ctx context.Context, c *app.RequestContext) error {
 	claims, err := RefreshTokenJwtMiddleware.GetClaimsFromJWT(ctx, c)
 	if err != nil {
-		return false
+		return errno.AuthNoToken
 	}
 
 	switch v := claims["exp"].(type) {
 	case nil:
-		return false
+		return errno.AuthNoToken
 	case float64:
 		if int64(v) < RefreshTokenJwtMiddleware.TimeFunc().Unix() {
-			return false
+			return errno.AuthRefreshExpired
 		}
 	case json.Number:
 		n, err := v.Int64()
 		if err != nil {
-			return false
+			return errno.NewErrNo(errno.InternalServiceErrorCode, "Token parse error")
 		}
 		if n < RefreshTokenJwtMiddleware.TimeFunc().Unix() {
-			return false
+			return errno.AuthRefreshExpired
 		}
 	default:
-		return false
+		return errno.NewErrNo(errno.InternalServiceErrorCode, "Token parse error")
 	}
 
 	c.Set("JWT_PAYLOAD", claims)
@@ -208,10 +208,10 @@ func IsRefreshTokenAvailable(ctx context.Context, c *app.RequestContext) bool {
 		c.Set(RefreshTokenJwtMiddleware.IdentityKey, identity)
 	}
 	if !RefreshTokenJwtMiddleware.Authorizator(identity, ctx, c) {
-		return false
+		return errno.AuthInvalid
 	}
 
-	return true
+	return nil
 }
 
 func GenerateAccessToken(c *app.RequestContext) {

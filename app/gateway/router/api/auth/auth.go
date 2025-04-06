@@ -5,6 +5,7 @@ import (
 	"TikTok-rpc/app/gateway/pack"
 	"TikTok-rpc/pkg/errno"
 	"context"
+	"errors"
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -17,14 +18,28 @@ func Auth() []app.HandlerFunc {
 
 func DoubleTokenAuthFunc() app.HandlerFunc {
 	return func(ctx context.Context, c *app.RequestContext) {
-		if !jwt.IsAccessTokenAvailable(ctx, c) {
-			if !jwt.IsRefreshTokenAvailable(ctx, c) {
-				pack.SendFailResponse(c, errno.AuthInvalid)
-				c.Abort()
-				return
+		Aerr := jwt.IsAccessTokenAvailable(ctx, c)
+		if Aerr != nil {
+			if errors.Is(Aerr, errno.AuthAccessExpired) {
+				Rerr := jwt.IsRefreshTokenAvailable(ctx, c)
+				if Rerr != nil {
+					pack.SendFailResponse(c, errno.ConvertErr(Rerr))
+				}
+				jwt.GenerateAccessToken(c)
+			} else {
+				pack.SendFailResponse(c, errno.ConvertErr(Aerr))
 			}
-			jwt.GenerateAccessToken(c)
 		}
 		c.Next(ctx)
 	}
 }
+
+//if !jwt.IsAccessTokenAvailable(ctx, c) {
+//	if !jwt.IsRefreshTokenAvailable(ctx, c) {
+//		pack.SendFailResponse(c, errno.AuthInvalid)
+//		c.Abort()
+//		return
+//	}
+//	jwt.GenerateAccessToken(c)
+//}
+//c.Next(ctx)
