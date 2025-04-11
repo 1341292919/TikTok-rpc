@@ -3,89 +3,146 @@
 package video
 
 import (
+	"TikTok-rpc/app/gateway/pack"
+	"TikTok-rpc/app/gateway/rpc"
+	"TikTok-rpc/app/gateway/service"
+	"TikTok-rpc/kitex_gen/video"
+	"TikTok-rpc/pkg/errno"
 	"context"
 
-	video "TikTok-rpc/app/gateway/model/api/video"
+	api "TikTok-rpc/app/gateway/model/api/video"
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
 // PublishVideo .
 // @router /video/publish [POST]
 func PublishVideo(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req video.PublishRequest
+	var req api.PublishRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
 		return
 	}
-
-	resp := new(video.PublishResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	data, err := c.FormFile("data")
+	if err != nil {
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, "required file but found not "))
+		return
+	}
+	userId := service.GetUserIDFromContext(c)
+	videoUrl, coverUrl, err := service.UploadVideoGetUrl(data, userId)
+	if err != nil {
+		pack.SendFailResponse(c, errno.ConvertErr(err))
+		return
+	}
+	resp := new(api.PublishResponse)
+	err = rpc.PublishVideoRPC(ctx, &video.PublishRequest{
+		UserId:      userId,
+		Title:       req.Title,
+		VideoUrl:    videoUrl,
+		CoverUrl:    coverUrl,
+		Description: req.Description,
+	})
+	if err != nil {
+		pack.SendFailResponse(c, errno.ConvertErr(err))
+		return
+	}
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
 }
 
 // QueryList .
 // @router /video/list [GET]
 func QueryList(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req video.QueryPublishListRequest
+	var req api.QueryPublishListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
 		return
 	}
 
-	resp := new(video.QueryPublishListResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	resp := new(api.QueryPublishListResponse)
+	resp, err = rpc.QueryPublishListRPC(ctx, &video.QueryPublishListRequest{
+		UserId:   req.UserID,
+		PageSize: req.PageSize,
+		PageNum:  req.PageNum,
+	})
+	if err != nil {
+		pack.SendFailResponse(c, errno.ConvertErr(err))
+		return
+	}
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
 }
 
 // SearchVideo .
 // @router /video/search [POST]
 func SearchVideo(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req video.SearchVideoByKeywordRequest
+	var req api.SearchVideoByKeywordRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
 		return
 	}
 
-	resp := new(video.SearchVideoByKeywordResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	resp := new(api.SearchVideoByKeywordResponse)
+	resp, err = rpc.SearchVideoRPC(ctx, &video.SearchVideoByKeywordRequest{
+		Keyword:  req.Keyword,
+		PageSize: req.PageSize,
+		PageNum:  req.PageNum,
+		ToDate:   req.ToDate,
+		FromDate: req.FromDate,
+	})
+	if err != nil {
+		pack.SendFailResponse(c, errno.ConvertErr(err))
+		return
+	}
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
 }
 
 // GetPopularVideo .
 // @router /video/popular [GET]
 func GetPopularVideo(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req video.GetPopularListRequest
+	var req api.GetPopularListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
 		return
 	}
 
-	resp := new(video.GetPopularListResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	resp := new(api.GetPopularListResponse)
+	resp, err = rpc.GetPopularListRPC(ctx, &video.GetPopularListRequest{
+		PageSize: req.PageSize,
+		PageNum:  req.PageNum,
+	})
+	if err != nil {
+		pack.SendFailResponse(c, errno.ConvertErr(err))
+	}
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
 }
 
 // GetVideoStream .
 // @router /video/feed [GET]
 func GetVideoStream(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req video.VideoStreamRequest
+	var req api.VideoStreamRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
 		return
 	}
 
-	resp := new(video.VideoStreamResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	resp := new(api.VideoStreamResponse)
+	resp, err = rpc.VideoStreamRPC(ctx, &video.VideoStreamRequest{
+		LatestTime: req.LatestTime,
+		PageSize:   req.PageSize,
+		PageNum:    req.PageNum,
+	})
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
 }

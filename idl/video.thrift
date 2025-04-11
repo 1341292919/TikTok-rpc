@@ -5,12 +5,14 @@ include"model.thrift"
 struct PublishRequest{
     1: required string title,
     2: required string description,
-    3: binary data ,//视频file
+    3: required string video_url,
     4: required i64 user_id,
+    5: required string cover_url,
 }
 
 struct PublishResponse{
      1: model.BaseResp base,
+     2 :i64 id,
 }
 //发布列表
 struct QueryPublishListRequest{
