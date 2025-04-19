@@ -10,7 +10,7 @@ func User(data *rpc.User) *model.User {
 		ID:        data.Id,
 		Username:  data.Username,
 		AvatarURL: data.AvatarUrl,
-		CreatedAt: data.CreatedAt,
-		UpdatedAt: data.UpdatedAt,
+		CreatedAt: ChangeFormat(data.CreatedAt),
+		UpdatedAt: ChangeFormat(data.UpdatedAt),
 	}
 }

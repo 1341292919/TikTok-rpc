@@ -30,5 +30,6 @@ const (
 const (
 	InternalServiceErrorCode  = 50000 + iota // 内部服务错误
 	InterFileProcessErrorCode                //文件处理错误
-
+	InternalDatabaseErrorCode
+	InternalRedisErrorCode // Redis错误
 )

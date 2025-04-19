@@ -29,14 +29,18 @@ struct Video{
     11: required string updated_at
     12: required string deleted_at
 }
+
 struct Comment{
     1: required string id,//评论id
     2: required string user_id,
     3: required string video_id,
     4: required string content,
-    5: required string created_at
-    6: required string updated_at
-    7: required string deleted_at
+    5: required string created_at,
+    6: required string updated_at,
+    7: required string deleted_at,
+    8: required string parent_id,
+     9: required i64 like_count,
+     10: required i64 child_count,
 }
 
 struct SimpleUserList{

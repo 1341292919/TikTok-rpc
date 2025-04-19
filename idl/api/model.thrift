@@ -37,6 +37,9 @@ struct Comment{
     5: required string created_at
     6: required string updated_at
     7: required string deleted_at
+    8: required string parent_id,
+    9: required i64 like_count,
+    10: required i64 child_count,
 }
 
 struct SimpleUserList{

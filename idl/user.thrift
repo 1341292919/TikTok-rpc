@@ -9,7 +9,7 @@ struct RegisterRequest{
 
 struct RegisterResponse{
     1: model.BaseResp base,
-    2: required i64 user_id,
+    2: optional i64 user_id,
 }
 //登录
 struct LoginRequest{
@@ -20,7 +20,7 @@ struct LoginRequest{
 
 struct LoginResponse{
     1: model.BaseResp base,
-    2: model.User data,
+    2: optional model.User data,
 }
 
 //以图搜图
@@ -30,7 +30,7 @@ struct SearchImagesRequest{
 
 struct SearchImagesResponse{
     1:model.BaseResp base,
-    2:string data //返回图片存储的url
+    2:optional string data //返回图片存储的url
 }
 
 //上传头像
@@ -40,7 +40,7 @@ struct UploadAvatarRequest{
 }
 struct UploadAvatarResponse{
     1: model.BaseResp base,
-    2: model.User data,
+    2: optional model.User data,
 }
 //获取用户信息
 struct GetUserInformationRequest{
@@ -48,7 +48,7 @@ struct GetUserInformationRequest{
 }
 struct GetUserInformationResponse{
     1: model.BaseResp base,
-    2:model.User data,
+    2: optional model.User data,
 }
 //获取 MFA qrcode
 struct GetMFARequest{
@@ -56,7 +56,7 @@ struct GetMFARequest{
 }
 struct GetMFAResponse{
     1:model.BaseResp base,
-    2:model.MFAMessage data,
+    2:optional model.MFAMessage data,
 }
 //绑定多因素身份认证(MFA)
 struct MFABindRequest{
@@ -68,6 +68,14 @@ struct MFABindRequest{
 struct MFABindResponse{
     1:model.BaseResp base,
 }
+struct QueryUserIdByUsernameRequest{
+    1:required string username,
+}
+struct QueryUserIdByUsernameResponse{
+        1:model.BaseResp base,
+        2:optional i64 id,
+}
+
 service UserService {
     RegisterResponse Register (1: RegisterRequest req),
     LoginResponse Login(1: LoginRequest req),
@@ -75,5 +83,6 @@ service UserService {
     GetUserInformationResponse GetInformation(1:GetUserInformationRequest req),
     SearchImagesResponse SearchImage(1:SearchImagesRequest req),
     GetMFAResponse GetMFA(1:GetMFARequest req),
-    MFABindResponse MindBind(1:MFABindRequest req)
+    MFABindResponse MindBind(1:MFABindRequest req),
+    QueryUserIdByUsernameResponse QueryUserIdByUsername(1:QueryUserIdByUsernameRequest req),
 }

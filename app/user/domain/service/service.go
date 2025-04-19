@@ -48,3 +48,10 @@ func (svc *UserService) GetUserInfoById(ctx context.Context, user *model.User) (
 func (svc *UserService) UpdateMFA(ctx context.Context, user *model.User, mfa *model.MFAMessage) error {
 	return svc.db.UpdateMFA(ctx, user, mfa)
 }
+func (svc *UserService) QueryUserIdByUsername(ctx context.Context, user *model.User) (int64, error) {
+	data, err := svc.db.QueryUserIdByUsername(ctx, user)
+	if err != nil {
+		return -1, err
+	}
+	return data.Uid, nil
+}

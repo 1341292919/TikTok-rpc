@@ -14,6 +14,7 @@ type UserUseCase interface {
 	UploadAvatar(ctx context.Context, user *model.User) (*model.User, error)
 	GetMFACode(ctx context.Context, user *model.User) (*model.MFA, error)
 	MFABind(ctx context.Context, user *model.User, code, secret string) error
+	QueryUserIdByUsername(ctx context.Context, user *model.User) (int64, error)
 }
 
 // svc下辖db层

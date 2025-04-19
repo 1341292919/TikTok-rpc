@@ -4,6 +4,7 @@ import (
 	"TikTok-rpc/app/user/domain/model"
 	"TikTok-rpc/app/user/domain/repository"
 	"TikTok-rpc/pkg/constants"
+	"TikTok-rpc/pkg/errno"
 	"context"
 	"gorm.io/gorm"
 )
@@ -154,4 +155,26 @@ func (db *userDB) CheckMFA(ctx context.Context, user *model.User) (*model.MFAMes
 		Status: userResp.MfaStatus,
 	}, nil
 
+}
+func (db *userDB) QueryUserIdByUsername(ctx context.Context, user *model.User) (*model.User, error) {
+	var userResp *User
+	err := db.client.WithContext(ctx).
+		Table(constants.TableUser).
+		Where("username = ?", user.UserName).
+		Find(&userResp).
+		Error
+	if err != nil {
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, err.Error())
+	}
+	if userResp == nil {
+		return nil, errno.NewErrNo(errno.ServiceUserNotExistCode, "username not exist")
+	}
+	return &model.User{
+		Uid:       userResp.Id,
+		UserName:  userResp.Username,
+		AvatarUrl: userResp.AvatarUrl,
+		UpdateAT:  userResp.UpdatedAt.Unix(),
+		CreateAT:  userResp.CreatedAt.Unix(),
+		DeleteAT:  0,
+	}, nil
 }
