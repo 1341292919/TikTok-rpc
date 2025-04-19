@@ -21,7 +21,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	var req api.RegisterRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, "param missing:"+err.Error()))
 		return
 	}
 	resp := new(api.RegisterResponse)
@@ -45,7 +45,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	var req api.LoginRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, "param missing:"+err.Error()))
 		return
 	}
 
@@ -82,7 +82,7 @@ func UploadAvatar(ctx context.Context, c *app.RequestContext) {
 	}
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, "param missing:"+err.Error()))
 		return
 	}
 	userId := service.GetUserIDFromContext(c)
@@ -113,7 +113,7 @@ func GetInformation(ctx context.Context, c *app.RequestContext) {
 	var req api.GetUserInformationRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, "param missing:"+err.Error()))
 		return
 	}
 	resp := new(api.GetUserInformationResponse)
@@ -176,7 +176,7 @@ func MindBind(ctx context.Context, c *app.RequestContext) {
 	var req api.MFABindRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, "param missing:"+err.Error()))
 		return
 	}
 

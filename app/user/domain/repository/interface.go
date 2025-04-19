@@ -12,4 +12,5 @@ type UserDB interface {
 	UpdateUser(ctx context.Context, user *model.User) (*model.User, error)
 	UpdateMFA(ctx context.Context, user *model.User, mfa *model.MFAMessage) error
 	CheckMFA(ctx context.Context, user *model.User) (*model.MFAMessage, error)
+	QueryUserIdByUsername(ctx context.Context, user *model.User) (*model.User, error)
 }

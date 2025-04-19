@@ -29,7 +29,7 @@ struct SearchVideoByKeywordRequest{
      3: required string keyword(api.form="keyword"), //关键词
      4: optional i64 from_date(api.form="from_date"),         //起始日期
      5: optional i64 to_date(api.form="to_date"),            //终止日期
-     6:string username(api.form="username"),        //对应用户的视频
+     6: optional string username(api.form="username"),        //对应用户的视频
 }
 
 struct SearchVideoByKeywordResponse{

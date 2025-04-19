@@ -124,3 +124,7 @@ func (uc *useCase) MFABind(ctx context.Context, user *model.User, code, secret s
 	}
 	return nil
 }
+
+func (uc *useCase) QueryUserIdByUsername(ctx context.Context, user *model.User) (int64, error) {
+	return uc.svc.QueryUserIdByUsername(ctx, user)
+}

@@ -7,7 +7,6 @@ import (
 	"TikTok-rpc/kitex_gen/user"
 	"TikTok-rpc/pkg/errno"
 	"context"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
 
 // UserServiceImpl implements the last service interface defined in the IDL.
@@ -26,15 +25,12 @@ func (s *UserServiceImpl) Register(ctx context.Context, req *user.RegisterReques
 		UserName: req.Username,
 		Password: req.Password,
 	}
-	hlog.Infof("%v", req.Username)
-	//这里面是rpc的第一层 应该封装返回体，所以关注err上的信息吗？
-	var uid int64
-	uid, err = s.useCase.RegisterUser(ctx, u)
-	if err != nil {
-		resp.Base = pack.BuildBaseResp(errno.ConvertErr(err))
+	uid, e := s.useCase.RegisterUser(ctx, u)
+	if e != nil {
+		resp.Base = pack.BuildBaseResp(errno.ConvertErr(e))
 		return
 	}
-	resp.UserId = uid
+	resp.UserId = &uid
 	resp.Base = pack.BuildBaseResp(errno.Success)
 	return
 }
@@ -56,9 +52,9 @@ func (s *UserServiceImpl) Login(ctx context.Context, req *user.LoginRequest) (re
 			Code:     *req.Code,
 		}
 	}
-	userData, err := s.useCase.Login(ctx, u)
-	if err != nil {
-		resp.Base = pack.BuildBaseResp(errno.ConvertErr(err))
+	userData, e := s.useCase.Login(ctx, u)
+	if e != nil {
+		resp.Base = pack.BuildBaseResp(errno.ConvertErr(e))
 		return
 	}
 	resp.Data = pack.BuildUser(userData)
@@ -73,9 +69,9 @@ func (s *UserServiceImpl) UploadAvatar(ctx context.Context, req *user.UploadAvat
 		AvatarUrl: req.AvatarUrl,
 		Uid:       req.UserId,
 	}
-	userData, err := s.useCase.UploadAvatar(ctx, u)
-	if err != nil {
-		resp.Base = pack.BuildBaseResp(errno.ConvertErr(err))
+	userData, e := s.useCase.UploadAvatar(ctx, u)
+	if e != nil {
+		resp.Base = pack.BuildBaseResp(errno.ConvertErr(e))
 		return
 	}
 	resp.Data = pack.BuildUser(userData)
@@ -89,9 +85,9 @@ func (s *UserServiceImpl) GetInformation(ctx context.Context, req *user.GetUserI
 	u := &model.User{
 		Uid: req.UserId,
 	}
-	userData, err := s.useCase.GetUserInfo(ctx, u)
-	if err != nil {
-		resp.Base = pack.BuildBaseResp(errno.ConvertErr(err))
+	userData, e := s.useCase.GetUserInfo(ctx, u)
+	if e != nil {
+		resp.Base = pack.BuildBaseResp(errno.ConvertErr(e))
 		return
 	}
 	resp.Data = pack.BuildUser(userData)
@@ -111,9 +107,9 @@ func (s *UserServiceImpl) GetMFA(ctx context.Context, req *user.GetMFARequest) (
 	u := &model.User{
 		Uid: req.UserId,
 	}
-	userData, err := s.useCase.GetMFACode(ctx, u)
-	if err != nil {
-		resp.Base = pack.BuildBaseResp(errno.ConvertErr(err))
+	userData, e := s.useCase.GetMFACode(ctx, u)
+	if e != nil {
+		resp.Base = pack.BuildBaseResp(errno.ConvertErr(e))
 		return
 	}
 	resp.Data = pack.BuildMFA(userData)
@@ -127,11 +123,25 @@ func (s *UserServiceImpl) MindBind(ctx context.Context, req *user.MFABindRequest
 	u := &model.User{
 		Uid: req.UserId,
 	}
-	err = s.useCase.MFABind(ctx, u, req.Code, req.Secret)
-	if err != nil {
-		resp.Base = pack.BuildBaseResp(errno.ConvertErr(err))
+	e := s.useCase.MFABind(ctx, u, req.Code, req.Secret)
+	if e != nil {
+		resp.Base = pack.BuildBaseResp(errno.ConvertErr(e))
 		return
 	}
 	resp.Base = pack.BuildBaseResp(errno.Success)
+	return
+}
+func (s *UserServiceImpl) QueryUserIdByUsername(ctx context.Context, req *user.QueryUserIdByUsernameRequest) (resp *user.QueryUserIdByUsernameResponse, err error) {
+	resp = new(user.QueryUserIdByUsernameResponse)
+	u := &model.User{
+		UserName: req.Username,
+	}
+	id, e := s.useCase.QueryUserIdByUsername(ctx, u)
+	if e != nil {
+		resp.Base = pack.BuildBaseResp(errno.ConvertErr(e))
+		return
+	}
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	resp.Id = &id
 	return
 }

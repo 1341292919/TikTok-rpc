@@ -18,7 +18,7 @@ struct QueryFollowListRequest{  //查看对应id的关注
 }
 struct QueryFollowListResponse{
       1:model.BaseResp base,
-      2:model.SimpleUserList data,
+      2:optional model.SimpleUserList data,
 }
 struct QueryFollowerListRequest{ //查看指定id的粉丝
      1: required i64 user_id,
@@ -27,7 +27,7 @@ struct QueryFollowerListRequest{ //查看指定id的粉丝
 }
 struct QueryFollowerListResponse{
       1:model.BaseResp base,
-      2:model.SimpleUserList data,
+      2:optional model.SimpleUserList data,
 }
 struct QueryFriendListRequest{
     1: required i64 page_size,  //每一页的数量
@@ -35,7 +35,7 @@ struct QueryFriendListRequest{
 }
 struct QueryFriendListResponse{
       1:model.BaseResp base,
-      2:model.SimpleUserList data,
+      2: optional model.SimpleUserList data,
 }
 
 service SocializeService{

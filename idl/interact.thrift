@@ -21,7 +21,7 @@ struct QueryLikeListRequest{
 
 struct QueryLikeListResponse{
     1:model.BaseResp base,
-    2:model.VideoList data,
+    2:optional model.VideoList data,
 }
 //评论
 struct CommentRequest{
@@ -34,6 +34,7 @@ struct CommentRequest{
 
 struct CommentResponse{
     1:model.BaseResp base,
+    2:optional i64 comment_id,
 }
 //查看评论列表
 struct QueryCommentListRequest{
@@ -45,7 +46,7 @@ struct QueryCommentListRequest{
 
 struct QueryCommentListResponse{
     1:model.BaseResp base,
-    2:model.CommentList data,
+    2:optional model.CommentList data,
 }
 //删除评论
 struct DeleteCommentRequest{
@@ -61,7 +62,7 @@ struct DeleteCommentResponse{
 service InteractService{
    LikeResponse Like(1:LikeRequest req),
    QueryLikeListResponse QueryLikeList(1:QueryLikeListRequest req),
-   CommentResponse CommentVideo(1:CommentRequest req),
+   CommentResponse Comment(1:CommentRequest req),
    QueryCommentListResponse QueryCommentList(1:QueryCommentListRequest req),
    DeleteCommentResponse DeleteComment(1:DeleteCommentRequest req),
 }
