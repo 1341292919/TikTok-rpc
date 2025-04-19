@@ -21,4 +21,5 @@ type VideoReq struct {
 	PageSize int64
 	FromDate int64
 	ToDate   int64
+	Username string
 }

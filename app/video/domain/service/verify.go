@@ -2,9 +2,9 @@ package service
 
 import "TikTok-rpc/pkg/errno"
 
-type VideoVerifyFuncs func() error
+type VideoVerifyFunc func() error
 
-func (svc *VideoService) Verify(funcs ...VideoVerifyFuncs) error {
+func (svc *VideoService) Verify(funcs ...VideoVerifyFunc) error {
 	for _, f := range funcs {
 		if err := f(); err != nil {
 			return err
@@ -14,7 +14,7 @@ func (svc *VideoService) Verify(funcs ...VideoVerifyFuncs) error {
 }
 
 // 检验传入的日期
-func (svc *VideoService) VerifyDate(todate, fromdate int64) VideoVerifyFuncs {
+func (svc *VideoService) VerifyDate(todate, fromdate int64) VideoVerifyFunc {
 	return func() error {
 		//传入的日期为空
 		if todate == 0 && fromdate == 0 {
@@ -25,7 +25,7 @@ func (svc *VideoService) VerifyDate(todate, fromdate int64) VideoVerifyFuncs {
 		return nil
 	}
 }
-func (svc *VideoService) VerifyPageParam(pagesize, pagenum int64) VideoVerifyFuncs {
+func (svc *VideoService) VerifyPageParam(pagesize, pagenum int64) VideoVerifyFunc {
 	return func() error {
 		if pagenum <= 0 || pagesize <= 0 {
 			return errno.NewErrNo(errno.ParamLogicalErrorCode, "pagesize,pagenum must over 0")

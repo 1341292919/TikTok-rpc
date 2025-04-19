@@ -30,7 +30,11 @@ func (ca *videoCache) NewIdToRank(ctx context.Context, vid int64) error {
 		Score:  0, //初始分数设为0
 		Member: vid,
 	}
-	_, err := ca.VideoId.ZAdd(ctx, constants.VideoIdKey, v).Result()
+	_, err := ca.VideoId.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
+		pipe.ZAdd(ctx, constants.VideoIdKey, v)
+		pipe.Expire(ctx, constants.VideoIdKey, 5*time.Minute)
+		return nil
+	})
 	if err != nil {
 		return errno.NewErrNo(errno.InternalRedisErrorCode, "AddIdToRank :"+err.Error())
 	}
@@ -106,4 +110,21 @@ func (ca *videoCache) GetVideoByRank(ctx context.Context, count int64) ([]*model
 		videos[i] = video
 	}
 	return videos, nil
+}
+func (ca *videoCache) DeleteVideoRank(ctx context.Context) error {
+	// 删除视频排行Key
+	_, err := ca.Video.Del(ctx, constants.VideoKey).Result()
+	if err != nil {
+		return errno.NewErrNo(errno.InternalRedisErrorCode, "DeleteVideoRank failed: "+err.Error())
+	}
+	return nil
+}
+
+func (ca *videoCache) DeleteVideoIdRank(ctx context.Context) error {
+	// 删除视频ID排行Key
+	_, err := ca.VideoId.Del(ctx, constants.VideoIdKey).Result()
+	if err != nil {
+		return errno.NewErrNo(errno.InternalRedisErrorCode, "DeleteVideoIdRank failed: "+err.Error())
+	}
+	return nil
 }

@@ -24,10 +24,14 @@ func DoubleTokenAuthFunc() app.HandlerFunc {
 				Rerr := jwt.IsRefreshTokenAvailable(ctx, c)
 				if Rerr != nil {
 					pack.SendFailResponse(c, errno.ConvertErr(Rerr))
+					c.Abort()
+					return
 				}
 				jwt.GenerateAccessToken(c)
 			} else {
 				pack.SendFailResponse(c, errno.ConvertErr(Aerr))
+				c.Abort()
+				return
 			}
 		}
 		c.Next(ctx)

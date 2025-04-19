@@ -38,12 +38,12 @@ func (db *videoDB) CreateVideo(ctx context.Context, video *model.Video) (int64, 
 	}
 	return videoResp.Id, nil
 }
-func (db *videoDB) IsVideoExist(ctx context.Context, uid int64) (bool, error) {
+func (db *videoDB) IsVideoExist(ctx context.Context, id int64) (bool, error) {
 	var video *Video
 	err := db.client.
 		WithContext(ctx).
 		Table(constants.TableVideo).
-		Where("user_id = ?", uid).
+		Where("id = ?", id).
 		First(&video).
 		Error
 	if err != nil {
@@ -134,15 +134,29 @@ func (db *videoDB) QueryVideoByKeyWord(ctx context.Context, req *model.VideoReq)
 	from_date := time.Unix(req.FromDate, 0)
 	to_date := time.Unix(req.ToDate, 0)
 	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		err := tx.
-			Table(constants.TableVideo).
-			Where("created_at >= ? AND created_at <= ? ", from_date, to_date).
-			Where("title LIKE ? OR description LIKE ?", keyword, keyword).
-			Limit(int(req.PageSize)).
-			Offset(int((req.PageNum - 1) * req.PageSize)).
-			Count(&count).
-			Find(&videoResp).
-			Error
+		var err error
+		if req.Uid == -1 {
+			err = tx.
+				Table(constants.TableVideo).
+				Where("created_at >= ? AND created_at <= ? ", from_date, to_date).
+				Where("title LIKE ? OR description LIKE ?", keyword, keyword).
+				Limit(int(req.PageSize)).
+				Offset(int((req.PageNum - 1) * req.PageSize)).
+				Count(&count).
+				Find(&videoResp).
+				Error
+		} else {
+			err = tx.
+				Table(constants.TableVideo).
+				Where("created_at >= ? AND created_at <= ? ", from_date, to_date).
+				Where("title LIKE ? OR description LIKE ?", keyword, keyword).
+				Where("id = ?", req.Uid).
+				Limit(int(req.PageSize)).
+				Offset(int((req.PageNum - 1) * req.PageSize)).
+				Count(&count).
+				Find(&videoResp).
+				Error
+		}
 		if err != nil {
 			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get videoInfo: %v", err)
 		}
@@ -189,6 +203,61 @@ func (db *videoDB) QueryPopularVideo(ctx context.Context, req *model.VideoReq) (
 	}
 	return buildVideoList(videoResp), count, nil
 }
+func (db *videoDB) UpdateCommentCount(ctx context.Context, videoid, changecount int64) error {
+	err := db.client.WithContext(ctx).
+		Table(constants.TableVideo).
+		Where("id = ?", videoid).
+		Update("comment_count", gorm.Expr("comment_count + ?", changecount)).
+		Error
+	if err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update comment count: %v", err)
+	}
+	return nil
+}
+func (db *videoDB) UpdateLikeCount(ctx context.Context, videoid, likecount int64) error {
+	err := db.client.WithContext(ctx).
+		Table(constants.TableVideo).
+		Where("id = ?", videoid).
+		Update("like_count", likecount).
+		Error
+	if err != nil {
+		return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update like count: %v", err)
+	}
+	return nil
+}
+
+func (db *videoDB) QueryVideoDuringTime(ctx context.Context, req *model.VideoReq) ([]*model.Video, int64, error) {
+	var videoResp []*Video
+	var count int64
+	from_date := time.Unix(req.FromDate, 0)
+	to_date := time.Unix(req.ToDate, 0)
+	err := db.client.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		err := tx.
+			Table(constants.TableVideo).
+			Where("created_at >= ? AND created_at <= ? ", from_date, to_date).
+			Limit(int(req.PageSize)).
+			Offset(int((req.PageNum - 1) * req.PageSize)).
+			Count(&count).
+			Find(&videoResp).
+			Error
+		if err != nil {
+			return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get videoInfo: %v", err)
+		}
+		for _, video := range videoResp {
+			err = updateVisitCount(tx, video.Id, 1)
+			if err != nil {
+				log.Printf("Failed to update visit_count for video %d: %v", video.Id, err)
+				return errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to update visit_count: %v", err)
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, -1, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql:Transaction falied: %v", err)
+	}
+	return buildVideoList(videoResp), count, nil
+}
+
 func updateVisitCount(tx *gorm.DB, videoid int64, delta int) error {
 	return tx.Table(constants.TableVideo).
 		Where("id = ?", videoid).
