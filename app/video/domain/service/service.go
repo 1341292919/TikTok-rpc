@@ -13,6 +13,7 @@ func (svc *VideoService) CreateVideo(ctx context.Context, video *model.Video) (i
 func (svc *VideoService) QueryPublishList(ctx context.Context, req *model.VideoReq) ([]*model.Video, int64, error) {
 	return svc.db.QueryVideoByUid(ctx, req)
 }
+
 func (svc *VideoService) SearchVideoByKeyWord(ctx context.Context, req *model.VideoReq) ([]*model.Video, int64, error) {
 	//检查参数 如果没有传入两个日期就把两个日期设置为 0~现在的日期
 	//这里又要检验一次参数？有没有好的解决办法
@@ -20,6 +21,16 @@ func (svc *VideoService) SearchVideoByKeyWord(ctx context.Context, req *model.Vi
 		req.ToDate = time.Now().Unix()
 		req.FromDate = 0
 	}
+	if req.Username == "" {
+		req.Uid = -1
+	} else {
+		id, err := svc.Rpc.QueryUserIdByUsername(ctx, req.Username)
+		if err != nil {
+			return nil, 0, err
+		}
+		req.Uid = id
+	}
+
 	return svc.db.QueryVideoByKeyWord(ctx, req)
 }
 
@@ -33,9 +44,13 @@ func (svc *VideoService) QueryPopularVideoList(ctx context.Context, req *model.V
 	if len(data) == 0 {
 		//从缓存中获取VID-从MySQL中获取视频信息-构建redis视频列表
 		vId, err := svc.cache.GetVideoIdByRank(ctx, 100)
+		if err != nil {
+			return nil, -1, err
+		}
 		//当vId也没有信息时
 		if len(vId) == 0 {
 			data, count, err = svc.db.QueryPopularVideo(ctx, req)
+
 			if err != nil {
 				return nil, -1, err
 			}
@@ -46,9 +61,6 @@ func (svc *VideoService) QueryPopularVideoList(ctx context.Context, req *model.V
 				}
 			}
 		} else {
-			if err != nil {
-				return nil, -1, err
-			}
 			data, err = svc.db.QueryVideoListById(ctx, vId)
 			if err != nil {
 				return nil, -1, err
@@ -59,13 +71,15 @@ func (svc *VideoService) QueryPopularVideoList(ctx context.Context, req *model.V
 			}
 		}
 	}
+
+	count = int64(len(data))
 	//按页分好
 	startIndex := (req.PageNum - 1) * req.PageSize
 	endIndex := startIndex + req.PageSize
 
 	count = int64(len(data))
-	if startIndex >= count {
-		return nil, 0, nil
+	if startIndex > count {
+		return nil, -1, nil
 	}
 
 	if endIndex > count {
@@ -76,6 +90,14 @@ func (svc *VideoService) QueryPopularVideoList(ctx context.Context, req *model.V
 }
 
 func (svc *VideoService) VideoStream(ctx context.Context, req *model.VideoReq) ([]*model.Video, int64, error) {
-	//暂时没有什么好的想法-要处理last-time时间逻辑
-	return svc.db.QueryVideoByKeyWord(ctx, req)
+	if req.ToDate == 0 {
+		req.ToDate = time.Now().Unix()
+		req.FromDate = 0
+	}
+	//视频流是不是刷到的视频不要再推送，那这样的逻辑应该怎么处理呢
+	data, count, err := svc.db.QueryVideoDuringTime(ctx, req)
+	if err != nil {
+		return nil, -1, err
+	}
+	return data, count, nil
 }

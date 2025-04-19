@@ -876,7 +876,7 @@ type SearchVideoByKeywordRequest struct {
 	//终止日期
 	ToDate *int64 `thrift:"to_date,5,optional" form:"to_date" json:"to_date,omitempty"`
 	//对应用户的视频
-	Username string `thrift:"username,6" form:"username" json:"username"`
+	Username *string `thrift:"username,6,optional" form:"username" json:"username,omitempty"`
 }
 
 func NewSearchVideoByKeywordRequest() *SearchVideoByKeywordRequest {
@@ -916,8 +916,13 @@ func (p *SearchVideoByKeywordRequest) GetToDate() (v int64) {
 	return *p.ToDate
 }
 
+var SearchVideoByKeywordRequest_Username_DEFAULT string
+
 func (p *SearchVideoByKeywordRequest) GetUsername() (v string) {
-	return p.Username
+	if !p.IsSetUsername() {
+		return SearchVideoByKeywordRequest_Username_DEFAULT
+	}
+	return *p.Username
 }
 
 var fieldIDToName_SearchVideoByKeywordRequest = map[int16]string{
@@ -935,6 +940,10 @@ func (p *SearchVideoByKeywordRequest) IsSetFromDate() bool {
 
 func (p *SearchVideoByKeywordRequest) IsSetToDate() bool {
 	return p.ToDate != nil
+}
+
+func (p *SearchVideoByKeywordRequest) IsSetUsername() bool {
+	return p.Username != nil
 }
 
 func (p *SearchVideoByKeywordRequest) Read(iprot thrift.TProtocol) (err error) {
@@ -1112,11 +1121,11 @@ func (p *SearchVideoByKeywordRequest) ReadField5(iprot thrift.TProtocol) error {
 }
 func (p *SearchVideoByKeywordRequest) ReadField6(iprot thrift.TProtocol) error {
 
-	var _field string
+	var _field *string
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		_field = v
+		_field = &v
 	}
 	p.Username = _field
 	return nil
@@ -1261,14 +1270,16 @@ WriteFieldEndError:
 }
 
 func (p *SearchVideoByKeywordRequest) writeField6(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("username", thrift.STRING, 6); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteString(p.Username); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
+	if p.IsSetUsername() {
+		if err = oprot.WriteFieldBegin("username", thrift.STRING, 6); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteString(*p.Username); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
 	}
 	return nil
 WriteFieldBeginError:

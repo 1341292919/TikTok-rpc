@@ -28,11 +28,12 @@ func (s *VideoServiceImpl) PublishVideo(ctx context.Context, req *video.PublishR
 		Title:       req.Title,
 		Description: req.Description,
 	}
-	id, err := s.useCase.PublishVideo(ctx, v)
-	if err != nil {
+	id, e := s.useCase.PublishVideo(ctx, v)
+	if e != nil {
 		resp.Base = pack.BuildBaseResp(errno.ConvertErr(err))
+		return
 	}
-	resp.Id = id
+	resp.Id = &id
 	resp.Base = pack.BuildBaseResp(errno.Success)
 	return
 }
@@ -45,8 +46,8 @@ func (s *VideoServiceImpl) QueryList(ctx context.Context, req *video.QueryPublis
 		PageNum:  req.PageNum,
 		PageSize: req.PageSize,
 	}
-	videoData, count, err := s.useCase.QueryPublishList(ctx, v)
-	if err != nil {
+	videoData, count, e := s.useCase.QueryPublishList(ctx, v)
+	if e != nil {
 		resp.Base = pack.BuildBaseResp(errno.ConvertErr(err))
 		return
 	}
@@ -74,8 +75,11 @@ func (s *VideoServiceImpl) SearchVideo(ctx context.Context, req *video.SearchVid
 			FromDate: *req.FromDate,
 		}
 	}
-	videoData, count, err := s.useCase.SearchVideo(ctx, v)
-	if err != nil {
+	if req.Username != nil {
+		v.Username = *req.Username
+	}
+	videoData, count, e := s.useCase.SearchVideo(ctx, v)
+	if e != nil {
 		resp.Base = pack.BuildBaseResp(errno.ConvertErr(err))
 		return
 	}
@@ -91,8 +95,8 @@ func (s *VideoServiceImpl) GetPopularVideo(ctx context.Context, req *video.GetPo
 		PageNum:  req.PageNum,
 		PageSize: req.PageSize,
 	}
-	videoData, count, err := s.useCase.PopularVideoList(ctx, v)
-	if err != nil {
+	videoData, count, e := s.useCase.PopularVideoList(ctx, v)
+	if e != nil {
 		resp.Base = pack.BuildBaseResp(errno.ConvertErr(err))
 		return
 	}
@@ -117,12 +121,46 @@ func (s *VideoServiceImpl) GetVideoStream(ctx context.Context, req *video.VideoS
 			ToDate:   *req.LatestTime,
 		}
 	}
-	videoData, count, err := s.useCase.QueryPublishList(ctx, v)
-	if err != nil {
+	videoData, count, e := s.useCase.GetVideoStream(ctx, v)
+	if e != nil {
 		resp.Base = pack.BuildBaseResp(errno.ConvertErr(err))
 		return
 	}
 	resp.Data = pack.BuildVideoList(videoData, count)
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	return
+}
+
+func (s *VideoServiceImpl) QueryVideoById(ctx context.Context, req *video.QueryVideoByVIdRequest) (resp *video.QueryVideoByVIdResponse, err error) {
+	resp = new(video.QueryVideoByVIdResponse)
+	videoData, e := s.useCase.QueryVideoByID(ctx, req.VideoId)
+	if e != nil {
+		resp.Base = pack.BuildBaseResp(errno.ConvertErr(e))
+		return
+	}
+	resp.Data = pack.BuildVideo(videoData)
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	return
+}
+
+func (s *VideoServiceImpl) UpdateCommentCount(ctx context.Context, req *video.UpdateVideoCommentCountRequest) (resp *video.UpdateVideoCommentCountResponse, err error) {
+	resp = new(video.UpdateVideoCommentCountResponse)
+	e := s.useCase.UpdateCommentCount(ctx, req.VideoId, req.ChangeCount)
+	if e != nil {
+		resp.Base = pack.BuildBaseResp(errno.ConvertErr(err))
+		return
+	}
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	return
+}
+
+func (s *VideoServiceImpl) UpdateLikeCount(ctx context.Context, req *video.UpdateVideoLikeCountRequest) (resp *video.UpdateVideoLikeCountResponse, err error) {
+	resp = new(video.UpdateVideoLikeCountResponse)
+	e := s.useCase.UpdateLikeCount(ctx, req.VideoId, req.LikeCount)
+	if e != nil {
+		resp.Base = pack.BuildBaseResp(errno.ConvertErr(err))
+		return
+	}
 	resp.Base = pack.BuildBaseResp(errno.Success)
 	return
 }

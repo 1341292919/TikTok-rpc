@@ -58,7 +58,7 @@ func QueryList(ctx context.Context, c *app.RequestContext) {
 	var req api.QueryPublishListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, "param missing:"+err.Error()))
 		return
 	}
 
@@ -83,7 +83,7 @@ func SearchVideo(ctx context.Context, c *app.RequestContext) {
 	var req api.SearchVideoByKeywordRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, "param missing:"+err.Error()))
 		return
 	}
 
@@ -94,6 +94,7 @@ func SearchVideo(ctx context.Context, c *app.RequestContext) {
 		PageNum:  req.PageNum,
 		ToDate:   req.ToDate,
 		FromDate: req.FromDate,
+		Username: req.Username,
 	})
 	if err != nil {
 		pack.SendFailResponse(c, errno.ConvertErr(err))
@@ -110,7 +111,7 @@ func GetPopularVideo(ctx context.Context, c *app.RequestContext) {
 	var req api.GetPopularListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, "param missing:"+err.Error()))
 		return
 	}
 
@@ -121,6 +122,7 @@ func GetPopularVideo(ctx context.Context, c *app.RequestContext) {
 	})
 	if err != nil {
 		pack.SendFailResponse(c, errno.ConvertErr(err))
+		return
 	}
 	resp.Base = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)
@@ -133,7 +135,7 @@ func GetVideoStream(ctx context.Context, c *app.RequestContext) {
 	var req api.VideoStreamRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, "param missing:"+err.Error()))
 		return
 	}
 
@@ -143,6 +145,10 @@ func GetVideoStream(ctx context.Context, c *app.RequestContext) {
 		PageSize:   req.PageSize,
 		PageNum:    req.PageNum,
 	})
+	if err != nil {
+		pack.SendFailResponse(c, errno.ConvertErr(err))
+		return
+	}
 	resp.Base = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)
 }
