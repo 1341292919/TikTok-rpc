@@ -3,89 +3,141 @@
 package interact
 
 import (
+	"TikTok-rpc/app/gateway/pack"
+	"TikTok-rpc/app/gateway/rpc"
+	"TikTok-rpc/app/gateway/service"
+	"TikTok-rpc/pkg/errno"
 	"context"
 
-	interact "TikTok-rpc/app/gateway/model/api/interact"
+	api "TikTok-rpc/app/gateway/model/api/interact"
+	"TikTok-rpc/kitex_gen/interact"
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
 // Like .
 // @router /like/action [POST]
 func Like(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req interact.LikeRequest
+	var req api.LikeRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, "param missing:"+err.Error()))
 		return
 	}
 
-	resp := new(interact.LikeResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	resp := new(api.LikeResponse)
+	userid := service.GetUserIDFromContext(c)
+	err = rpc.LikeRPC(ctx, &interact.LikeRequest{
+		VideoId:    req.VideoID,
+		CommentId:  req.CommentID,
+		ActionType: req.ActionType,
+		UserId:     userid,
+	})
+	if err != nil {
+		pack.SendFailResponse(c, errno.ConvertErr(err))
+		return
+	}
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
 }
 
 // QueryLikeList .
 // @router /like/list [GET]
 func QueryLikeList(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req interact.QueryLikeListRequest
+	var req api.QueryLikeListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, "param missing:"+err.Error()))
 		return
 	}
 
-	resp := new(interact.QueryLikeListResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	resp := new(api.QueryLikeListResponse)
+	resp, err = rpc.QueryLikeListPRC(ctx, &interact.QueryLikeListRequest{
+		UserId:   req.UserID,
+		PageNum:  req.PageNum,
+		PageSize: req.PageSize,
+	})
+	if err != nil {
+		pack.SendFailResponse(c, errno.ConvertErr(err))
+		return
+	}
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
 }
 
 // CommentVideo .
 // @router /comment/publish [POST]
 func CommentVideo(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req interact.CommentRequest
+	var req api.CommentRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, "param missing:"+err.Error()))
 		return
 	}
 
-	resp := new(interact.CommentResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	resp := new(api.CommentResponse)
+	userid := service.GetUserIDFromContext(c)
+	err = rpc.CommentRPC(ctx, &interact.CommentRequest{
+		CommentId: req.CommentID,
+		VideoId:   req.VideoID,
+		Content:   req.Content,
+		UserId:    userid,
+	})
+	if err != nil {
+		pack.SendFailResponse(c, errno.ConvertErr(err))
+		return
+	}
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
 }
 
 // QueryCommentList .
 // @router /comment/list [GET]
 func QueryCommentList(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req interact.QueryCommentListRequest
+	var req api.QueryCommentListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, "param missing:"+err.Error()))
 		return
 	}
 
-	resp := new(interact.QueryCommentListResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	resp := new(api.QueryCommentListResponse)
+	resp, err = rpc.QueryCommentListPRC(ctx, &interact.QueryCommentListRequest{
+		VideoId:   req.VideoID,
+		PageNum:   req.PageNum,
+		PageSize:  req.PageSize,
+		CommentId: req.CommentID,
+	})
+	if err != nil {
+		pack.SendFailResponse(c, errno.ConvertErr(err))
+		return
+	}
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
 }
 
 // DeleteComment .
 // @router /comment/delete [DELETE]
 func DeleteComment(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req interact.DeleteCommentRequest
+	var req api.DeleteCommentRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, "param missing:"+err.Error()))
 		return
 	}
 
-	resp := new(interact.DeleteCommentResponse)
+	resp := new(api.DeleteCommentResponse)
+	userid := service.GetUserIDFromContext(c)
+	err = rpc.DeleteCommentPRC(ctx, &interact.DeleteCommentRequest{
+		CommentId: req.CommentID,
+		VideoId:   req.VideoID,
+		UserId:    userid,
+	})
 
-	c.JSON(consts.StatusOK, resp)
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
 }

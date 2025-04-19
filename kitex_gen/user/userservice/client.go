@@ -18,6 +18,7 @@ type Client interface {
 	SearchImage(ctx context.Context, req *user.SearchImagesRequest, callOptions ...callopt.Option) (r *user.SearchImagesResponse, err error)
 	GetMFA(ctx context.Context, req *user.GetMFARequest, callOptions ...callopt.Option) (r *user.GetMFAResponse, err error)
 	MindBind(ctx context.Context, req *user.MFABindRequest, callOptions ...callopt.Option) (r *user.MFABindResponse, err error)
+	QueryUserIdByUsername(ctx context.Context, req *user.QueryUserIdByUsernameRequest, callOptions ...callopt.Option) (r *user.QueryUserIdByUsernameResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -82,4 +83,9 @@ func (p *kUserServiceClient) GetMFA(ctx context.Context, req *user.GetMFARequest
 func (p *kUserServiceClient) MindBind(ctx context.Context, req *user.MFABindRequest, callOptions ...callopt.Option) (r *user.MFABindResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.MindBind(ctx, req)
+}
+
+func (p *kUserServiceClient) QueryUserIdByUsername(ctx context.Context, req *user.QueryUserIdByUsernameRequest, callOptions ...callopt.Option) (r *user.QueryUserIdByUsernameResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.QueryUserIdByUsername(ctx, req)
 }

@@ -30,9 +30,9 @@ func RegisterRPC(ctx context.Context, req *user.RegisterRequest) error {
 		return errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsRPCSuccess(resp.Base) { // 将其标注为服务错误，那么如果是数据库错误呢
-		return errno.InternalServiceError.WithMessage(resp.Base.Msg)
+		return errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
-	return err
+	return nil
 }
 
 // 登录
@@ -62,7 +62,6 @@ func SearchImageRPC(ctx context.Context, req *user.SearchImagesRequest) (*api.Se
 	if !utils.IsRPCSuccess(resp.Base) {
 		return nil, errno.InternalServiceError.WithMessage(resp.Base.Msg)
 	}
-	apiResp.Data = resp.Data
 	return apiResp, nil
 }
 

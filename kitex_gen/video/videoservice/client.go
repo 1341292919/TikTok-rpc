@@ -16,6 +16,9 @@ type Client interface {
 	SearchVideo(ctx context.Context, req *video.SearchVideoByKeywordRequest, callOptions ...callopt.Option) (r *video.SearchVideoByKeywordResponse, err error)
 	GetPopularVideo(ctx context.Context, req *video.GetPopularListRequest, callOptions ...callopt.Option) (r *video.GetPopularListResponse, err error)
 	GetVideoStream(ctx context.Context, req *video.VideoStreamRequest, callOptions ...callopt.Option) (r *video.VideoStreamResponse, err error)
+	QueryVideoById(ctx context.Context, req *video.QueryVideoByVIdRequest, callOptions ...callopt.Option) (r *video.QueryVideoByVIdResponse, err error)
+	UpdateCommentCount(ctx context.Context, req *video.UpdateVideoCommentCountRequest, callOptions ...callopt.Option) (r *video.UpdateVideoCommentCountResponse, err error)
+	UpdateLikeCount(ctx context.Context, req *video.UpdateVideoLikeCountRequest, callOptions ...callopt.Option) (r *video.UpdateVideoLikeCountResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -70,4 +73,19 @@ func (p *kVideoServiceClient) GetPopularVideo(ctx context.Context, req *video.Ge
 func (p *kVideoServiceClient) GetVideoStream(ctx context.Context, req *video.VideoStreamRequest, callOptions ...callopt.Option) (r *video.VideoStreamResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GetVideoStream(ctx, req)
+}
+
+func (p *kVideoServiceClient) QueryVideoById(ctx context.Context, req *video.QueryVideoByVIdRequest, callOptions ...callopt.Option) (r *video.QueryVideoByVIdResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.QueryVideoById(ctx, req)
+}
+
+func (p *kVideoServiceClient) UpdateCommentCount(ctx context.Context, req *video.UpdateVideoCommentCountRequest, callOptions ...callopt.Option) (r *video.UpdateVideoCommentCountResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.UpdateCommentCount(ctx, req)
+}
+
+func (p *kVideoServiceClient) UpdateLikeCount(ctx context.Context, req *video.UpdateVideoLikeCountRequest, callOptions ...callopt.Option) (r *video.UpdateVideoLikeCountResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.UpdateLikeCount(ctx, req)
 }

@@ -62,6 +62,13 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"QueryUserIdByUsername": kitex.NewMethodInfo(
+		queryUserIdByUsernameHandler,
+		newUserServiceQueryUserIdByUsernameArgs,
+		newUserServiceQueryUserIdByUsernameResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 }
 
 var (
@@ -254,6 +261,24 @@ func newUserServiceMindBindResult() interface{} {
 	return user.NewUserServiceMindBindResult()
 }
 
+func queryUserIdByUsernameHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceQueryUserIdByUsernameArgs)
+	realResult := result.(*user.UserServiceQueryUserIdByUsernameResult)
+	success, err := handler.(user.UserService).QueryUserIdByUsername(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceQueryUserIdByUsernameArgs() interface{} {
+	return user.NewUserServiceQueryUserIdByUsernameArgs()
+}
+
+func newUserServiceQueryUserIdByUsernameResult() interface{} {
+	return user.NewUserServiceQueryUserIdByUsernameResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -329,6 +354,16 @@ func (p *kClient) MindBind(ctx context.Context, req *user.MFABindRequest) (r *us
 	_args.Req = req
 	var _result user.UserServiceMindBindResult
 	if err = p.c.Call(ctx, "MindBind", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) QueryUserIdByUsername(ctx context.Context, req *user.QueryUserIdByUsernameRequest) (r *user.QueryUserIdByUsernameResponse, err error) {
+	var _args user.UserServiceQueryUserIdByUsernameArgs
+	_args.Req = req
+	var _result user.UserServiceQueryUserIdByUsernameResult
+	if err = p.c.Call(ctx, "QueryUserIdByUsername", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

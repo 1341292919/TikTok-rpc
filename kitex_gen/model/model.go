@@ -1713,13 +1713,16 @@ func (p *Video) Field12DeepEqual(src string) bool {
 }
 
 type Comment struct {
-	Id        string `thrift:"id,1,required" frugal:"1,required,string" json:"id"`
-	UserId    string `thrift:"user_id,2,required" frugal:"2,required,string" json:"user_id"`
-	VideoId   string `thrift:"video_id,3,required" frugal:"3,required,string" json:"video_id"`
-	Content   string `thrift:"content,4,required" frugal:"4,required,string" json:"content"`
-	CreatedAt string `thrift:"created_at,5,required" frugal:"5,required,string" json:"created_at"`
-	UpdatedAt string `thrift:"updated_at,6,required" frugal:"6,required,string" json:"updated_at"`
-	DeletedAt string `thrift:"deleted_at,7,required" frugal:"7,required,string" json:"deleted_at"`
+	Id         string `thrift:"id,1,required" frugal:"1,required,string" json:"id"`
+	UserId     string `thrift:"user_id,2,required" frugal:"2,required,string" json:"user_id"`
+	VideoId    string `thrift:"video_id,3,required" frugal:"3,required,string" json:"video_id"`
+	Content    string `thrift:"content,4,required" frugal:"4,required,string" json:"content"`
+	CreatedAt  string `thrift:"created_at,5,required" frugal:"5,required,string" json:"created_at"`
+	UpdatedAt  string `thrift:"updated_at,6,required" frugal:"6,required,string" json:"updated_at"`
+	DeletedAt  string `thrift:"deleted_at,7,required" frugal:"7,required,string" json:"deleted_at"`
+	ParentId   string `thrift:"parent_id,8,required" frugal:"8,required,string" json:"parent_id"`
+	LikeCount  int64  `thrift:"like_count,9,required" frugal:"9,required,i64" json:"like_count"`
+	ChildCount int64  `thrift:"child_count,10,required" frugal:"10,required,i64" json:"child_count"`
 }
 
 func NewComment() *Comment {
@@ -1756,6 +1759,18 @@ func (p *Comment) GetUpdatedAt() (v string) {
 func (p *Comment) GetDeletedAt() (v string) {
 	return p.DeletedAt
 }
+
+func (p *Comment) GetParentId() (v string) {
+	return p.ParentId
+}
+
+func (p *Comment) GetLikeCount() (v int64) {
+	return p.LikeCount
+}
+
+func (p *Comment) GetChildCount() (v int64) {
+	return p.ChildCount
+}
 func (p *Comment) SetId(val string) {
 	p.Id = val
 }
@@ -1777,15 +1792,27 @@ func (p *Comment) SetUpdatedAt(val string) {
 func (p *Comment) SetDeletedAt(val string) {
 	p.DeletedAt = val
 }
+func (p *Comment) SetParentId(val string) {
+	p.ParentId = val
+}
+func (p *Comment) SetLikeCount(val int64) {
+	p.LikeCount = val
+}
+func (p *Comment) SetChildCount(val int64) {
+	p.ChildCount = val
+}
 
 var fieldIDToName_Comment = map[int16]string{
-	1: "id",
-	2: "user_id",
-	3: "video_id",
-	4: "content",
-	5: "created_at",
-	6: "updated_at",
-	7: "deleted_at",
+	1:  "id",
+	2:  "user_id",
+	3:  "video_id",
+	4:  "content",
+	5:  "created_at",
+	6:  "updated_at",
+	7:  "deleted_at",
+	8:  "parent_id",
+	9:  "like_count",
+	10: "child_count",
 }
 
 func (p *Comment) Read(iprot thrift.TProtocol) (err error) {
@@ -1799,6 +1826,9 @@ func (p *Comment) Read(iprot thrift.TProtocol) (err error) {
 	var issetCreatedAt bool = false
 	var issetUpdatedAt bool = false
 	var issetDeletedAt bool = false
+	var issetParentId bool = false
+	var issetLikeCount bool = false
+	var issetChildCount bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -1877,6 +1907,33 @@ func (p *Comment) Read(iprot thrift.TProtocol) (err error) {
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
+		case 8:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField8(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetParentId = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 9:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField9(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetLikeCount = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 10:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField10(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetChildCount = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
 		default:
 			if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -1922,6 +1979,21 @@ func (p *Comment) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetDeletedAt {
 		fieldId = 7
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetParentId {
+		fieldId = 8
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetLikeCount {
+		fieldId = 9
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetChildCount {
+		fieldId = 10
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -2019,6 +2091,39 @@ func (p *Comment) ReadField7(iprot thrift.TProtocol) error {
 	p.DeletedAt = _field
 	return nil
 }
+func (p *Comment) ReadField8(iprot thrift.TProtocol) error {
+
+	var _field string
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.ParentId = _field
+	return nil
+}
+func (p *Comment) ReadField9(iprot thrift.TProtocol) error {
+
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.LikeCount = _field
+	return nil
+}
+func (p *Comment) ReadField10(iprot thrift.TProtocol) error {
+
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.ChildCount = _field
+	return nil
+}
 
 func (p *Comment) Write(oprot thrift.TProtocol) (err error) {
 
@@ -2053,6 +2158,18 @@ func (p *Comment) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField7(oprot); err != nil {
 			fieldId = 7
+			goto WriteFieldError
+		}
+		if err = p.writeField8(oprot); err != nil {
+			fieldId = 8
+			goto WriteFieldError
+		}
+		if err = p.writeField9(oprot); err != nil {
+			fieldId = 9
+			goto WriteFieldError
+		}
+		if err = p.writeField10(oprot); err != nil {
+			fieldId = 10
 			goto WriteFieldError
 		}
 	}
@@ -2192,6 +2309,57 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 7 end error: ", p), err)
 }
 
+func (p *Comment) writeField8(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("parent_id", thrift.STRING, 8); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.ParentId); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 8 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 8 end error: ", p), err)
+}
+
+func (p *Comment) writeField9(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("like_count", thrift.I64, 9); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.LikeCount); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 9 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 9 end error: ", p), err)
+}
+
+func (p *Comment) writeField10(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("child_count", thrift.I64, 10); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.ChildCount); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 10 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 10 end error: ", p), err)
+}
+
 func (p *Comment) String() string {
 	if p == nil {
 		return "<nil>"
@@ -2225,6 +2393,15 @@ func (p *Comment) DeepEqual(ano *Comment) bool {
 		return false
 	}
 	if !p.Field7DeepEqual(ano.DeletedAt) {
+		return false
+	}
+	if !p.Field8DeepEqual(ano.ParentId) {
+		return false
+	}
+	if !p.Field9DeepEqual(ano.LikeCount) {
+		return false
+	}
+	if !p.Field10DeepEqual(ano.ChildCount) {
 		return false
 	}
 	return true
@@ -2275,6 +2452,27 @@ func (p *Comment) Field6DeepEqual(src string) bool {
 func (p *Comment) Field7DeepEqual(src string) bool {
 
 	if strings.Compare(p.DeletedAt, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *Comment) Field8DeepEqual(src string) bool {
+
+	if strings.Compare(p.ParentId, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *Comment) Field9DeepEqual(src int64) bool {
+
+	if p.LikeCount != src {
+		return false
+	}
+	return true
+}
+func (p *Comment) Field10DeepEqual(src int64) bool {
+
+	if p.ChildCount != src {
 		return false
 	}
 	return true
