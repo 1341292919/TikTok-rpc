@@ -789,7 +789,7 @@ func (p *QueryFollowListRequest) Field3DeepEqual(src int64) bool {
 
 type QueryFollowListResponse struct {
 	Base *model.BaseResp       `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
-	Data *model.SimpleUserList `thrift:"data,2" frugal:"2,default,model.SimpleUserList" json:"data"`
+	Data *model.SimpleUserList `thrift:"data,2,optional" frugal:"2,optional,model.SimpleUserList" json:"data,omitempty"`
 }
 
 func NewQueryFollowListResponse() *QueryFollowListResponse {
@@ -968,14 +968,16 @@ WriteFieldEndError:
 }
 
 func (p *QueryFollowListResponse) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("data", thrift.STRUCT, 2); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := p.Data.Write(oprot); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
+	if p.IsSetData() {
+		if err = oprot.WriteFieldBegin("data", thrift.STRUCT, 2); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := p.Data.Write(oprot); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
 	}
 	return nil
 WriteFieldBeginError:
@@ -1328,7 +1330,7 @@ func (p *QueryFollowerListRequest) Field3DeepEqual(src int64) bool {
 
 type QueryFollowerListResponse struct {
 	Base *model.BaseResp       `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
-	Data *model.SimpleUserList `thrift:"data,2" frugal:"2,default,model.SimpleUserList" json:"data"`
+	Data *model.SimpleUserList `thrift:"data,2,optional" frugal:"2,optional,model.SimpleUserList" json:"data,omitempty"`
 }
 
 func NewQueryFollowerListResponse() *QueryFollowerListResponse {
@@ -1507,14 +1509,16 @@ WriteFieldEndError:
 }
 
 func (p *QueryFollowerListResponse) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("data", thrift.STRUCT, 2); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := p.Data.Write(oprot); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
+	if p.IsSetData() {
+		if err = oprot.WriteFieldBegin("data", thrift.STRUCT, 2); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := p.Data.Write(oprot); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
 	}
 	return nil
 WriteFieldBeginError:
@@ -1801,7 +1805,7 @@ func (p *QueryFriendListRequest) Field2DeepEqual(src int64) bool {
 
 type QueryFriendListResponse struct {
 	Base *model.BaseResp       `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
-	Data *model.SimpleUserList `thrift:"data,2" frugal:"2,default,model.SimpleUserList" json:"data"`
+	Data *model.SimpleUserList `thrift:"data,2,optional" frugal:"2,optional,model.SimpleUserList" json:"data,omitempty"`
 }
 
 func NewQueryFriendListResponse() *QueryFriendListResponse {
@@ -1980,14 +1984,16 @@ WriteFieldEndError:
 }
 
 func (p *QueryFriendListResponse) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("data", thrift.STRUCT, 2); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := p.Data.Write(oprot); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
+	if p.IsSetData() {
+		if err = oprot.WriteFieldBegin("data", thrift.STRUCT, 2); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := p.Data.Write(oprot); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
 	}
 	return nil
 WriteFieldBeginError:

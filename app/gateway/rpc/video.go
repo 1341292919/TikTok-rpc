@@ -33,7 +33,7 @@ func QueryPublishListRPC(ctx context.Context, req *video.QueryPublishListRequest
 	apiResp := &api.QueryPublishListResponse{}
 	resp, err := videoClient.QueryList(ctx, req)
 	if err != nil {
-		logger.Errorf("QueryPublishListRPC: RPC called failed: %v", err.Error())
+		logger.Errorf("QueryPublishRPC: RPC called failed: %v", err.Error())
 		return nil, errno.InternalServiceError.WithError(err)
 	}
 	if !utils.IsRPCSuccess(resp.Base) {

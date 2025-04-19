@@ -80,7 +80,7 @@ var fieldIDToName_RegisterRequest = map[int16]string{
 
 type RegisterResponse struct {
 	Base   *model.BaseResp `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
-	UserId int64           `thrift:"user_id,2,required" frugal:"2,required,i64" json:"user_id"`
+	UserId *int64          `thrift:"user_id,2,optional" frugal:"2,optional,i64" json:"user_id,omitempty"`
 }
 
 func NewRegisterResponse() *RegisterResponse {
@@ -99,18 +99,27 @@ func (p *RegisterResponse) GetBase() (v *model.BaseResp) {
 	return p.Base
 }
 
+var RegisterResponse_UserId_DEFAULT int64
+
 func (p *RegisterResponse) GetUserId() (v int64) {
-	return p.UserId
+	if !p.IsSetUserId() {
+		return RegisterResponse_UserId_DEFAULT
+	}
+	return *p.UserId
 }
 func (p *RegisterResponse) SetBase(val *model.BaseResp) {
 	p.Base = val
 }
-func (p *RegisterResponse) SetUserId(val int64) {
+func (p *RegisterResponse) SetUserId(val *int64) {
 	p.UserId = val
 }
 
 func (p *RegisterResponse) IsSetBase() bool {
 	return p.Base != nil
+}
+
+func (p *RegisterResponse) IsSetUserId() bool {
+	return p.UserId != nil
 }
 
 func (p *RegisterResponse) String() string {
@@ -142,9 +151,14 @@ func (p *RegisterResponse) Field1DeepEqual(src *model.BaseResp) bool {
 	}
 	return true
 }
-func (p *RegisterResponse) Field2DeepEqual(src int64) bool {
+func (p *RegisterResponse) Field2DeepEqual(src *int64) bool {
 
-	if p.UserId != src {
+	if p.UserId == src {
+		return true
+	} else if p.UserId == nil || src == nil {
+		return false
+	}
+	if *p.UserId != *src {
 		return false
 	}
 	return true
@@ -258,7 +272,7 @@ var fieldIDToName_LoginRequest = map[int16]string{
 
 type LoginResponse struct {
 	Base *model.BaseResp `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
-	Data *model.User     `thrift:"data,2" frugal:"2,default,model.User" json:"data"`
+	Data *model.User     `thrift:"data,2,optional" frugal:"2,optional,model.User" json:"data,omitempty"`
 }
 
 func NewLoginResponse() *LoginResponse {
@@ -393,7 +407,7 @@ var fieldIDToName_SearchImagesRequest = map[int16]string{
 
 type SearchImagesResponse struct {
 	Base *model.BaseResp `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
-	Data string          `thrift:"data,2" frugal:"2,default,string" json:"data"`
+	Data *string         `thrift:"data,2,optional" frugal:"2,optional,string" json:"data,omitempty"`
 }
 
 func NewSearchImagesResponse() *SearchImagesResponse {
@@ -412,18 +426,27 @@ func (p *SearchImagesResponse) GetBase() (v *model.BaseResp) {
 	return p.Base
 }
 
+var SearchImagesResponse_Data_DEFAULT string
+
 func (p *SearchImagesResponse) GetData() (v string) {
-	return p.Data
+	if !p.IsSetData() {
+		return SearchImagesResponse_Data_DEFAULT
+	}
+	return *p.Data
 }
 func (p *SearchImagesResponse) SetBase(val *model.BaseResp) {
 	p.Base = val
 }
-func (p *SearchImagesResponse) SetData(val string) {
+func (p *SearchImagesResponse) SetData(val *string) {
 	p.Data = val
 }
 
 func (p *SearchImagesResponse) IsSetBase() bool {
 	return p.Base != nil
+}
+
+func (p *SearchImagesResponse) IsSetData() bool {
+	return p.Data != nil
 }
 
 func (p *SearchImagesResponse) String() string {
@@ -455,9 +478,14 @@ func (p *SearchImagesResponse) Field1DeepEqual(src *model.BaseResp) bool {
 	}
 	return true
 }
-func (p *SearchImagesResponse) Field2DeepEqual(src string) bool {
+func (p *SearchImagesResponse) Field2DeepEqual(src *string) bool {
 
-	if strings.Compare(p.Data, src) != 0 {
+	if p.Data == src {
+		return true
+	} else if p.Data == nil || src == nil {
+		return false
+	}
+	if strings.Compare(*p.Data, *src) != 0 {
 		return false
 	}
 	return true
@@ -538,7 +566,7 @@ var fieldIDToName_UploadAvatarRequest = map[int16]string{
 
 type UploadAvatarResponse struct {
 	Base *model.BaseResp `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
-	Data *model.User     `thrift:"data,2" frugal:"2,default,model.User" json:"data"`
+	Data *model.User     `thrift:"data,2,optional" frugal:"2,optional,model.User" json:"data,omitempty"`
 }
 
 func NewUploadAvatarResponse() *UploadAvatarResponse {
@@ -673,7 +701,7 @@ var fieldIDToName_GetUserInformationRequest = map[int16]string{
 
 type GetUserInformationResponse struct {
 	Base *model.BaseResp `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
-	Data *model.User     `thrift:"data,2" frugal:"2,default,model.User" json:"data"`
+	Data *model.User     `thrift:"data,2,optional" frugal:"2,optional,model.User" json:"data,omitempty"`
 }
 
 func NewGetUserInformationResponse() *GetUserInformationResponse {
@@ -808,7 +836,7 @@ var fieldIDToName_GetMFARequest = map[int16]string{
 
 type GetMFAResponse struct {
 	Base *model.BaseResp   `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
-	Data *model.MFAMessage `thrift:"data,2" frugal:"2,default,model.MFAMessage" json:"data"`
+	Data *model.MFAMessage `thrift:"data,2,optional" frugal:"2,optional,model.MFAMessage" json:"data,omitempty"`
 }
 
 func NewGetMFAResponse() *GetMFAResponse {
@@ -1037,6 +1065,146 @@ var fieldIDToName_MFABindResponse = map[int16]string{
 	1: "base",
 }
 
+type QueryUserIdByUsernameRequest struct {
+	Username string `thrift:"username,1,required" frugal:"1,required,string" json:"username"`
+}
+
+func NewQueryUserIdByUsernameRequest() *QueryUserIdByUsernameRequest {
+	return &QueryUserIdByUsernameRequest{}
+}
+
+func (p *QueryUserIdByUsernameRequest) InitDefault() {
+}
+
+func (p *QueryUserIdByUsernameRequest) GetUsername() (v string) {
+	return p.Username
+}
+func (p *QueryUserIdByUsernameRequest) SetUsername(val string) {
+	p.Username = val
+}
+
+func (p *QueryUserIdByUsernameRequest) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("QueryUserIdByUsernameRequest(%+v)", *p)
+}
+
+func (p *QueryUserIdByUsernameRequest) DeepEqual(ano *QueryUserIdByUsernameRequest) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Username) {
+		return false
+	}
+	return true
+}
+
+func (p *QueryUserIdByUsernameRequest) Field1DeepEqual(src string) bool {
+
+	if strings.Compare(p.Username, src) != 0 {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_QueryUserIdByUsernameRequest = map[int16]string{
+	1: "username",
+}
+
+type QueryUserIdByUsernameResponse struct {
+	Base *model.BaseResp `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
+	Id   *int64          `thrift:"id,2,optional" frugal:"2,optional,i64" json:"id,omitempty"`
+}
+
+func NewQueryUserIdByUsernameResponse() *QueryUserIdByUsernameResponse {
+	return &QueryUserIdByUsernameResponse{}
+}
+
+func (p *QueryUserIdByUsernameResponse) InitDefault() {
+}
+
+var QueryUserIdByUsernameResponse_Base_DEFAULT *model.BaseResp
+
+func (p *QueryUserIdByUsernameResponse) GetBase() (v *model.BaseResp) {
+	if !p.IsSetBase() {
+		return QueryUserIdByUsernameResponse_Base_DEFAULT
+	}
+	return p.Base
+}
+
+var QueryUserIdByUsernameResponse_Id_DEFAULT int64
+
+func (p *QueryUserIdByUsernameResponse) GetId() (v int64) {
+	if !p.IsSetId() {
+		return QueryUserIdByUsernameResponse_Id_DEFAULT
+	}
+	return *p.Id
+}
+func (p *QueryUserIdByUsernameResponse) SetBase(val *model.BaseResp) {
+	p.Base = val
+}
+func (p *QueryUserIdByUsernameResponse) SetId(val *int64) {
+	p.Id = val
+}
+
+func (p *QueryUserIdByUsernameResponse) IsSetBase() bool {
+	return p.Base != nil
+}
+
+func (p *QueryUserIdByUsernameResponse) IsSetId() bool {
+	return p.Id != nil
+}
+
+func (p *QueryUserIdByUsernameResponse) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("QueryUserIdByUsernameResponse(%+v)", *p)
+}
+
+func (p *QueryUserIdByUsernameResponse) DeepEqual(ano *QueryUserIdByUsernameResponse) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Base) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Id) {
+		return false
+	}
+	return true
+}
+
+func (p *QueryUserIdByUsernameResponse) Field1DeepEqual(src *model.BaseResp) bool {
+
+	if !p.Base.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+func (p *QueryUserIdByUsernameResponse) Field2DeepEqual(src *int64) bool {
+
+	if p.Id == src {
+		return true
+	} else if p.Id == nil || src == nil {
+		return false
+	}
+	if *p.Id != *src {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_QueryUserIdByUsernameResponse = map[int16]string{
+	1: "base",
+	2: "id",
+}
+
 type UserService interface {
 	Register(ctx context.Context, req *RegisterRequest) (r *RegisterResponse, err error)
 
@@ -1051,6 +1219,8 @@ type UserService interface {
 	GetMFA(ctx context.Context, req *GetMFARequest) (r *GetMFAResponse, err error)
 
 	MindBind(ctx context.Context, req *MFABindRequest) (r *MFABindResponse, err error)
+
+	QueryUserIdByUsername(ctx context.Context, req *QueryUserIdByUsernameRequest) (r *QueryUserIdByUsernameResponse, err error)
 }
 
 type UserServiceRegisterArgs struct {
@@ -1862,5 +2032,121 @@ func (p *UserServiceMindBindResult) Field0DeepEqual(src *MFABindResponse) bool {
 }
 
 var fieldIDToName_UserServiceMindBindResult = map[int16]string{
+	0: "success",
+}
+
+type UserServiceQueryUserIdByUsernameArgs struct {
+	Req *QueryUserIdByUsernameRequest `thrift:"req,1" frugal:"1,default,QueryUserIdByUsernameRequest" json:"req"`
+}
+
+func NewUserServiceQueryUserIdByUsernameArgs() *UserServiceQueryUserIdByUsernameArgs {
+	return &UserServiceQueryUserIdByUsernameArgs{}
+}
+
+func (p *UserServiceQueryUserIdByUsernameArgs) InitDefault() {
+}
+
+var UserServiceQueryUserIdByUsernameArgs_Req_DEFAULT *QueryUserIdByUsernameRequest
+
+func (p *UserServiceQueryUserIdByUsernameArgs) GetReq() (v *QueryUserIdByUsernameRequest) {
+	if !p.IsSetReq() {
+		return UserServiceQueryUserIdByUsernameArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *UserServiceQueryUserIdByUsernameArgs) SetReq(val *QueryUserIdByUsernameRequest) {
+	p.Req = val
+}
+
+func (p *UserServiceQueryUserIdByUsernameArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *UserServiceQueryUserIdByUsernameArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceQueryUserIdByUsernameArgs(%+v)", *p)
+}
+
+func (p *UserServiceQueryUserIdByUsernameArgs) DeepEqual(ano *UserServiceQueryUserIdByUsernameArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceQueryUserIdByUsernameArgs) Field1DeepEqual(src *QueryUserIdByUsernameRequest) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceQueryUserIdByUsernameArgs = map[int16]string{
+	1: "req",
+}
+
+type UserServiceQueryUserIdByUsernameResult struct {
+	Success *QueryUserIdByUsernameResponse `thrift:"success,0,optional" frugal:"0,optional,QueryUserIdByUsernameResponse" json:"success,omitempty"`
+}
+
+func NewUserServiceQueryUserIdByUsernameResult() *UserServiceQueryUserIdByUsernameResult {
+	return &UserServiceQueryUserIdByUsernameResult{}
+}
+
+func (p *UserServiceQueryUserIdByUsernameResult) InitDefault() {
+}
+
+var UserServiceQueryUserIdByUsernameResult_Success_DEFAULT *QueryUserIdByUsernameResponse
+
+func (p *UserServiceQueryUserIdByUsernameResult) GetSuccess() (v *QueryUserIdByUsernameResponse) {
+	if !p.IsSetSuccess() {
+		return UserServiceQueryUserIdByUsernameResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *UserServiceQueryUserIdByUsernameResult) SetSuccess(x interface{}) {
+	p.Success = x.(*QueryUserIdByUsernameResponse)
+}
+
+func (p *UserServiceQueryUserIdByUsernameResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *UserServiceQueryUserIdByUsernameResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("UserServiceQueryUserIdByUsernameResult(%+v)", *p)
+}
+
+func (p *UserServiceQueryUserIdByUsernameResult) DeepEqual(ano *UserServiceQueryUserIdByUsernameResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *UserServiceQueryUserIdByUsernameResult) Field0DeepEqual(src *QueryUserIdByUsernameResponse) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+var fieldIDToName_UserServiceQueryUserIdByUsernameResult = map[int16]string{
 	0: "success",
 }

@@ -13,7 +13,7 @@ import (
 type Client interface {
 	Like(ctx context.Context, req *interact.LikeRequest, callOptions ...callopt.Option) (r *interact.LikeResponse, err error)
 	QueryLikeList(ctx context.Context, req *interact.QueryLikeListRequest, callOptions ...callopt.Option) (r *interact.QueryLikeListResponse, err error)
-	CommentVideo(ctx context.Context, req *interact.CommentRequest, callOptions ...callopt.Option) (r *interact.CommentResponse, err error)
+	Comment(ctx context.Context, req *interact.CommentRequest, callOptions ...callopt.Option) (r *interact.CommentResponse, err error)
 	QueryCommentList(ctx context.Context, req *interact.QueryCommentListRequest, callOptions ...callopt.Option) (r *interact.QueryCommentListResponse, err error)
 	DeleteComment(ctx context.Context, req *interact.DeleteCommentRequest, callOptions ...callopt.Option) (r *interact.DeleteCommentResponse, err error)
 }
@@ -57,9 +57,9 @@ func (p *kInteractServiceClient) QueryLikeList(ctx context.Context, req *interac
 	return p.kClient.QueryLikeList(ctx, req)
 }
 
-func (p *kInteractServiceClient) CommentVideo(ctx context.Context, req *interact.CommentRequest, callOptions ...callopt.Option) (r *interact.CommentResponse, err error) {
+func (p *kInteractServiceClient) Comment(ctx context.Context, req *interact.CommentRequest, callOptions ...callopt.Option) (r *interact.CommentResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.CommentVideo(ctx, req)
+	return p.kClient.Comment(ctx, req)
 }
 
 func (p *kInteractServiceClient) QueryCommentList(ctx context.Context, req *interact.QueryCommentListRequest, callOptions ...callopt.Option) (r *interact.QueryCommentListResponse, err error) {

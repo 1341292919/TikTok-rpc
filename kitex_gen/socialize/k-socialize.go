@@ -661,8 +661,10 @@ func (p *QueryFollowListResponse) fastWriteField1(buf []byte, w thrift.NocopyWri
 
 func (p *QueryFollowListResponse) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 2)
-	offset += p.Data.FastWriteNocopy(buf[offset:], w)
+	if p.IsSetData() {
+		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 2)
+		offset += p.Data.FastWriteNocopy(buf[offset:], w)
+	}
 	return offset
 }
 
@@ -675,8 +677,10 @@ func (p *QueryFollowListResponse) field1Length() int {
 
 func (p *QueryFollowListResponse) field2Length() int {
 	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += p.Data.BLength()
+	if p.IsSetData() {
+		l += thrift.Binary.FieldBeginLength()
+		l += p.Data.BLength()
+	}
 	return l
 }
 
@@ -1009,8 +1013,10 @@ func (p *QueryFollowerListResponse) fastWriteField1(buf []byte, w thrift.NocopyW
 
 func (p *QueryFollowerListResponse) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 2)
-	offset += p.Data.FastWriteNocopy(buf[offset:], w)
+	if p.IsSetData() {
+		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 2)
+		offset += p.Data.FastWriteNocopy(buf[offset:], w)
+	}
 	return offset
 }
 
@@ -1023,8 +1029,10 @@ func (p *QueryFollowerListResponse) field1Length() int {
 
 func (p *QueryFollowerListResponse) field2Length() int {
 	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += p.Data.BLength()
+	if p.IsSetData() {
+		l += thrift.Binary.FieldBeginLength()
+		l += p.Data.BLength()
+	}
 	return l
 }
 
@@ -1306,8 +1314,10 @@ func (p *QueryFriendListResponse) fastWriteField1(buf []byte, w thrift.NocopyWri
 
 func (p *QueryFriendListResponse) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 2)
-	offset += p.Data.FastWriteNocopy(buf[offset:], w)
+	if p.IsSetData() {
+		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 2)
+		offset += p.Data.FastWriteNocopy(buf[offset:], w)
+	}
 	return offset
 }
 
@@ -1320,8 +1330,10 @@ func (p *QueryFriendListResponse) field1Length() int {
 
 func (p *QueryFriendListResponse) field2Length() int {
 	l := 0
-	l += thrift.Binary.FieldBeginLength()
-	l += p.Data.BLength()
+	if p.IsSetData() {
+		l += thrift.Binary.FieldBeginLength()
+		l += p.Data.BLength()
+	}
 	return l
 }
 

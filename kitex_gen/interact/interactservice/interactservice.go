@@ -27,10 +27,10 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
-	"CommentVideo": kitex.NewMethodInfo(
-		commentVideoHandler,
-		newInteractServiceCommentVideoArgs,
-		newInteractServiceCommentVideoResult,
+	"Comment": kitex.NewMethodInfo(
+		commentHandler,
+		newInteractServiceCommentArgs,
+		newInteractServiceCommentResult,
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
@@ -150,22 +150,22 @@ func newInteractServiceQueryLikeListResult() interface{} {
 	return interact.NewInteractServiceQueryLikeListResult()
 }
 
-func commentVideoHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*interact.InteractServiceCommentVideoArgs)
-	realResult := result.(*interact.InteractServiceCommentVideoResult)
-	success, err := handler.(interact.InteractService).CommentVideo(ctx, realArg.Req)
+func commentHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*interact.InteractServiceCommentArgs)
+	realResult := result.(*interact.InteractServiceCommentResult)
+	success, err := handler.(interact.InteractService).Comment(ctx, realArg.Req)
 	if err != nil {
 		return err
 	}
 	realResult.Success = success
 	return nil
 }
-func newInteractServiceCommentVideoArgs() interface{} {
-	return interact.NewInteractServiceCommentVideoArgs()
+func newInteractServiceCommentArgs() interface{} {
+	return interact.NewInteractServiceCommentArgs()
 }
 
-func newInteractServiceCommentVideoResult() interface{} {
-	return interact.NewInteractServiceCommentVideoResult()
+func newInteractServiceCommentResult() interface{} {
+	return interact.NewInteractServiceCommentResult()
 }
 
 func queryCommentListHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -234,11 +234,11 @@ func (p *kClient) QueryLikeList(ctx context.Context, req *interact.QueryLikeList
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) CommentVideo(ctx context.Context, req *interact.CommentRequest) (r *interact.CommentResponse, err error) {
-	var _args interact.InteractServiceCommentVideoArgs
+func (p *kClient) Comment(ctx context.Context, req *interact.CommentRequest) (r *interact.CommentResponse, err error) {
+	var _args interact.InteractServiceCommentArgs
 	_args.Req = req
-	var _result interact.InteractServiceCommentVideoResult
-	if err = p.c.Call(ctx, "CommentVideo", &_args, &_result); err != nil {
+	var _result interact.InteractServiceCommentResult
+	if err = p.c.Call(ctx, "Comment", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
