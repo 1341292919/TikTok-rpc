@@ -5,6 +5,7 @@ import (
 	"TikTok-rpc/kitex_gen/socialize/socializeservice"
 	"TikTok-rpc/kitex_gen/user/userservice"
 	"TikTok-rpc/kitex_gen/video/videoservice"
+	"TikTok-rpc/kitex_gen/websocket/websocketservice"
 	"TikTok-rpc/pkg/constants"
 	"fmt"
 	"github.com/cloudwego/kitex/client"
@@ -17,6 +18,7 @@ var serviceToETCD = map[string][]string{
 	"video":     []string{constants.VideoETCD},
 	"interact":  []string{constants.InteractETCD},
 	"socialize": []string{constants.SocializeETCD},
+	"websocket": []string{constants.WebsocketETCD},
 }
 
 func initRpcClient[T any](serviceName string, newClientFunc func(string, ...client.Option) (T, error),
@@ -39,9 +41,7 @@ func initRpcClient[T any](serviceName string, newClientFunc func(string, ...clie
 	return &client, nil
 }
 
-func InitUserRPC() (*userservice.Client, error) {
-	return initRpcClient("user", userservice.NewClient)
-}
+func InitUserRPC() (*userservice.Client, error) { return initRpcClient("user", userservice.NewClient) }
 func InitVideoRPC() (*videoservice.Client, error) {
 	return initRpcClient("video", videoservice.NewClient)
 }
@@ -50,4 +50,7 @@ func InitInteractRPC() (*interactservice.Client, error) {
 }
 func InitSocializeRPC() (*socializeservice.Client, error) {
 	return initRpcClient("socialize", socializeservice.NewClient)
+}
+func InitWebsocketRPC() (*websocketservice.Client, error) {
+	return initRpcClient("websocket", websocketservice.NewClient)
 }

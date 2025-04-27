@@ -10,9 +10,9 @@ import (
 )
 
 type FollowRequest struct {
-	ToUserId   int64 `thrift:"to_user_id,1,required" frugal:"1,required,i64" json:"to_user_id"`
-	ActionType int64 `thrift:"action_type,2,required" frugal:"2,required,i64" json:"action_type"`
-	UserId     int64 `thrift:"user_id,3,required" frugal:"3,required,i64" json:"user_id"`
+	TargetUserId int64 `thrift:"target_user_id,1,required" frugal:"1,required,i64" json:"target_user_id"`
+	ActionType   int64 `thrift:"action_type,2,required" frugal:"2,required,i64" json:"action_type"`
+	UserId       int64 `thrift:"user_id,3,required" frugal:"3,required,i64" json:"user_id"`
 }
 
 func NewFollowRequest() *FollowRequest {
@@ -22,8 +22,8 @@ func NewFollowRequest() *FollowRequest {
 func (p *FollowRequest) InitDefault() {
 }
 
-func (p *FollowRequest) GetToUserId() (v int64) {
-	return p.ToUserId
+func (p *FollowRequest) GetTargetUserId() (v int64) {
+	return p.TargetUserId
 }
 
 func (p *FollowRequest) GetActionType() (v int64) {
@@ -33,8 +33,8 @@ func (p *FollowRequest) GetActionType() (v int64) {
 func (p *FollowRequest) GetUserId() (v int64) {
 	return p.UserId
 }
-func (p *FollowRequest) SetToUserId(val int64) {
-	p.ToUserId = val
+func (p *FollowRequest) SetTargetUserId(val int64) {
+	p.TargetUserId = val
 }
 func (p *FollowRequest) SetActionType(val int64) {
 	p.ActionType = val
@@ -44,7 +44,7 @@ func (p *FollowRequest) SetUserId(val int64) {
 }
 
 var fieldIDToName_FollowRequest = map[int16]string{
-	1: "to_user_id",
+	1: "target_user_id",
 	2: "action_type",
 	3: "user_id",
 }
@@ -53,7 +53,7 @@ func (p *FollowRequest) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetToUserId bool = false
+	var issetTargetUserId bool = false
 	var issetActionType bool = false
 	var issetUserId bool = false
 
@@ -76,7 +76,7 @@ func (p *FollowRequest) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetToUserId = true
+				issetTargetUserId = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -111,7 +111,7 @@ func (p *FollowRequest) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetToUserId {
+	if !issetTargetUserId {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -151,7 +151,7 @@ func (p *FollowRequest) ReadField1(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.ToUserId = _field
+	p.TargetUserId = _field
 	return nil
 }
 func (p *FollowRequest) ReadField2(iprot thrift.TProtocol) error {
@@ -215,10 +215,10 @@ WriteStructEndError:
 }
 
 func (p *FollowRequest) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("to_user_id", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("target_user_id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.ToUserId); err != nil {
+	if err := oprot.WriteI64(p.TargetUserId); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -279,7 +279,7 @@ func (p *FollowRequest) DeepEqual(ano *FollowRequest) bool {
 	} else if p == nil || ano == nil {
 		return false
 	}
-	if !p.Field1DeepEqual(ano.ToUserId) {
+	if !p.Field1DeepEqual(ano.TargetUserId) {
 		return false
 	}
 	if !p.Field2DeepEqual(ano.ActionType) {
@@ -293,7 +293,7 @@ func (p *FollowRequest) DeepEqual(ano *FollowRequest) bool {
 
 func (p *FollowRequest) Field1DeepEqual(src int64) bool {
 
-	if p.ToUserId != src {
+	if p.TargetUserId != src {
 		return false
 	}
 	return true
@@ -1024,47 +1024,47 @@ func (p *QueryFollowListResponse) Field2DeepEqual(src *model.SimpleUserList) boo
 	return true
 }
 
-type QueryFollowerListRequest struct {
+type QueryFansListRequest struct {
 	UserId   int64 `thrift:"user_id,1,required" frugal:"1,required,i64" json:"user_id"`
 	PageSize int64 `thrift:"page_size,2,required" frugal:"2,required,i64" json:"page_size"`
 	PageNum  int64 `thrift:"page_num,3,required" frugal:"3,required,i64" json:"page_num"`
 }
 
-func NewQueryFollowerListRequest() *QueryFollowerListRequest {
-	return &QueryFollowerListRequest{}
+func NewQueryFansListRequest() *QueryFansListRequest {
+	return &QueryFansListRequest{}
 }
 
-func (p *QueryFollowerListRequest) InitDefault() {
+func (p *QueryFansListRequest) InitDefault() {
 }
 
-func (p *QueryFollowerListRequest) GetUserId() (v int64) {
+func (p *QueryFansListRequest) GetUserId() (v int64) {
 	return p.UserId
 }
 
-func (p *QueryFollowerListRequest) GetPageSize() (v int64) {
+func (p *QueryFansListRequest) GetPageSize() (v int64) {
 	return p.PageSize
 }
 
-func (p *QueryFollowerListRequest) GetPageNum() (v int64) {
+func (p *QueryFansListRequest) GetPageNum() (v int64) {
 	return p.PageNum
 }
-func (p *QueryFollowerListRequest) SetUserId(val int64) {
+func (p *QueryFansListRequest) SetUserId(val int64) {
 	p.UserId = val
 }
-func (p *QueryFollowerListRequest) SetPageSize(val int64) {
+func (p *QueryFansListRequest) SetPageSize(val int64) {
 	p.PageSize = val
 }
-func (p *QueryFollowerListRequest) SetPageNum(val int64) {
+func (p *QueryFansListRequest) SetPageNum(val int64) {
 	p.PageNum = val
 }
 
-var fieldIDToName_QueryFollowerListRequest = map[int16]string{
+var fieldIDToName_QueryFansListRequest = map[int16]string{
 	1: "user_id",
 	2: "page_size",
 	3: "page_num",
 }
 
-func (p *QueryFollowerListRequest) Read(iprot thrift.TProtocol) (err error) {
+func (p *QueryFansListRequest) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -1146,7 +1146,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_QueryFollowerListRequest[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_QueryFansListRequest[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -1155,10 +1155,10 @@ ReadFieldEndError:
 ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 RequiredFieldNotSetError:
-	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_QueryFollowerListRequest[fieldId]))
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_QueryFansListRequest[fieldId]))
 }
 
-func (p *QueryFollowerListRequest) ReadField1(iprot thrift.TProtocol) error {
+func (p *QueryFansListRequest) ReadField1(iprot thrift.TProtocol) error {
 
 	var _field int64
 	if v, err := iprot.ReadI64(); err != nil {
@@ -1169,7 +1169,7 @@ func (p *QueryFollowerListRequest) ReadField1(iprot thrift.TProtocol) error {
 	p.UserId = _field
 	return nil
 }
-func (p *QueryFollowerListRequest) ReadField2(iprot thrift.TProtocol) error {
+func (p *QueryFansListRequest) ReadField2(iprot thrift.TProtocol) error {
 
 	var _field int64
 	if v, err := iprot.ReadI64(); err != nil {
@@ -1180,7 +1180,7 @@ func (p *QueryFollowerListRequest) ReadField2(iprot thrift.TProtocol) error {
 	p.PageSize = _field
 	return nil
 }
-func (p *QueryFollowerListRequest) ReadField3(iprot thrift.TProtocol) error {
+func (p *QueryFansListRequest) ReadField3(iprot thrift.TProtocol) error {
 
 	var _field int64
 	if v, err := iprot.ReadI64(); err != nil {
@@ -1192,10 +1192,10 @@ func (p *QueryFollowerListRequest) ReadField3(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *QueryFollowerListRequest) Write(oprot thrift.TProtocol) (err error) {
+func (p *QueryFansListRequest) Write(oprot thrift.TProtocol) (err error) {
 
 	var fieldId int16
-	if err = oprot.WriteStructBegin("QueryFollowerListRequest"); err != nil {
+	if err = oprot.WriteStructBegin("QueryFansListRequest"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -1229,7 +1229,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *QueryFollowerListRequest) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *QueryFansListRequest) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("user_id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -1246,7 +1246,7 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *QueryFollowerListRequest) writeField2(oprot thrift.TProtocol) (err error) {
+func (p *QueryFansListRequest) writeField2(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("page_size", thrift.I64, 2); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -1263,7 +1263,7 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
-func (p *QueryFollowerListRequest) writeField3(oprot thrift.TProtocol) (err error) {
+func (p *QueryFansListRequest) writeField3(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("page_num", thrift.I64, 3); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -1280,15 +1280,15 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 
-func (p *QueryFollowerListRequest) String() string {
+func (p *QueryFansListRequest) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("QueryFollowerListRequest(%+v)", *p)
+	return fmt.Sprintf("QueryFansListRequest(%+v)", *p)
 
 }
 
-func (p *QueryFollowerListRequest) DeepEqual(ano *QueryFollowerListRequest) bool {
+func (p *QueryFansListRequest) DeepEqual(ano *QueryFansListRequest) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -1306,21 +1306,21 @@ func (p *QueryFollowerListRequest) DeepEqual(ano *QueryFollowerListRequest) bool
 	return true
 }
 
-func (p *QueryFollowerListRequest) Field1DeepEqual(src int64) bool {
+func (p *QueryFansListRequest) Field1DeepEqual(src int64) bool {
 
 	if p.UserId != src {
 		return false
 	}
 	return true
 }
-func (p *QueryFollowerListRequest) Field2DeepEqual(src int64) bool {
+func (p *QueryFansListRequest) Field2DeepEqual(src int64) bool {
 
 	if p.PageSize != src {
 		return false
 	}
 	return true
 }
-func (p *QueryFollowerListRequest) Field3DeepEqual(src int64) bool {
+func (p *QueryFansListRequest) Field3DeepEqual(src int64) bool {
 
 	if p.PageNum != src {
 		return false
@@ -1328,56 +1328,56 @@ func (p *QueryFollowerListRequest) Field3DeepEqual(src int64) bool {
 	return true
 }
 
-type QueryFollowerListResponse struct {
+type QueryFansListResponse struct {
 	Base *model.BaseResp       `thrift:"base,1" frugal:"1,default,model.BaseResp" json:"base"`
 	Data *model.SimpleUserList `thrift:"data,2,optional" frugal:"2,optional,model.SimpleUserList" json:"data,omitempty"`
 }
 
-func NewQueryFollowerListResponse() *QueryFollowerListResponse {
-	return &QueryFollowerListResponse{}
+func NewQueryFansListResponse() *QueryFansListResponse {
+	return &QueryFansListResponse{}
 }
 
-func (p *QueryFollowerListResponse) InitDefault() {
+func (p *QueryFansListResponse) InitDefault() {
 }
 
-var QueryFollowerListResponse_Base_DEFAULT *model.BaseResp
+var QueryFansListResponse_Base_DEFAULT *model.BaseResp
 
-func (p *QueryFollowerListResponse) GetBase() (v *model.BaseResp) {
+func (p *QueryFansListResponse) GetBase() (v *model.BaseResp) {
 	if !p.IsSetBase() {
-		return QueryFollowerListResponse_Base_DEFAULT
+		return QueryFansListResponse_Base_DEFAULT
 	}
 	return p.Base
 }
 
-var QueryFollowerListResponse_Data_DEFAULT *model.SimpleUserList
+var QueryFansListResponse_Data_DEFAULT *model.SimpleUserList
 
-func (p *QueryFollowerListResponse) GetData() (v *model.SimpleUserList) {
+func (p *QueryFansListResponse) GetData() (v *model.SimpleUserList) {
 	if !p.IsSetData() {
-		return QueryFollowerListResponse_Data_DEFAULT
+		return QueryFansListResponse_Data_DEFAULT
 	}
 	return p.Data
 }
-func (p *QueryFollowerListResponse) SetBase(val *model.BaseResp) {
+func (p *QueryFansListResponse) SetBase(val *model.BaseResp) {
 	p.Base = val
 }
-func (p *QueryFollowerListResponse) SetData(val *model.SimpleUserList) {
+func (p *QueryFansListResponse) SetData(val *model.SimpleUserList) {
 	p.Data = val
 }
 
-var fieldIDToName_QueryFollowerListResponse = map[int16]string{
+var fieldIDToName_QueryFansListResponse = map[int16]string{
 	1: "base",
 	2: "data",
 }
 
-func (p *QueryFollowerListResponse) IsSetBase() bool {
+func (p *QueryFansListResponse) IsSetBase() bool {
 	return p.Base != nil
 }
 
-func (p *QueryFollowerListResponse) IsSetData() bool {
+func (p *QueryFansListResponse) IsSetData() bool {
 	return p.Data != nil
 }
 
-func (p *QueryFollowerListResponse) Read(iprot thrift.TProtocol) (err error) {
+func (p *QueryFansListResponse) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -1431,7 +1431,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_QueryFollowerListResponse[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_QueryFansListResponse[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -1441,7 +1441,7 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *QueryFollowerListResponse) ReadField1(iprot thrift.TProtocol) error {
+func (p *QueryFansListResponse) ReadField1(iprot thrift.TProtocol) error {
 	_field := model.NewBaseResp()
 	if err := _field.Read(iprot); err != nil {
 		return err
@@ -1449,7 +1449,7 @@ func (p *QueryFollowerListResponse) ReadField1(iprot thrift.TProtocol) error {
 	p.Base = _field
 	return nil
 }
-func (p *QueryFollowerListResponse) ReadField2(iprot thrift.TProtocol) error {
+func (p *QueryFansListResponse) ReadField2(iprot thrift.TProtocol) error {
 	_field := model.NewSimpleUserList()
 	if err := _field.Read(iprot); err != nil {
 		return err
@@ -1458,10 +1458,10 @@ func (p *QueryFollowerListResponse) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *QueryFollowerListResponse) Write(oprot thrift.TProtocol) (err error) {
+func (p *QueryFansListResponse) Write(oprot thrift.TProtocol) (err error) {
 
 	var fieldId int16
-	if err = oprot.WriteStructBegin("QueryFollowerListResponse"); err != nil {
+	if err = oprot.WriteStructBegin("QueryFansListResponse"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -1491,7 +1491,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *QueryFollowerListResponse) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *QueryFansListResponse) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("base", thrift.STRUCT, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -1508,7 +1508,7 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *QueryFollowerListResponse) writeField2(oprot thrift.TProtocol) (err error) {
+func (p *QueryFansListResponse) writeField2(oprot thrift.TProtocol) (err error) {
 	if p.IsSetData() {
 		if err = oprot.WriteFieldBegin("data", thrift.STRUCT, 2); err != nil {
 			goto WriteFieldBeginError
@@ -1527,15 +1527,15 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
-func (p *QueryFollowerListResponse) String() string {
+func (p *QueryFansListResponse) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("QueryFollowerListResponse(%+v)", *p)
+	return fmt.Sprintf("QueryFansListResponse(%+v)", *p)
 
 }
 
-func (p *QueryFollowerListResponse) DeepEqual(ano *QueryFollowerListResponse) bool {
+func (p *QueryFansListResponse) DeepEqual(ano *QueryFansListResponse) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -1550,14 +1550,14 @@ func (p *QueryFollowerListResponse) DeepEqual(ano *QueryFollowerListResponse) bo
 	return true
 }
 
-func (p *QueryFollowerListResponse) Field1DeepEqual(src *model.BaseResp) bool {
+func (p *QueryFansListResponse) Field1DeepEqual(src *model.BaseResp) bool {
 
 	if !p.Base.DeepEqual(src) {
 		return false
 	}
 	return true
 }
-func (p *QueryFollowerListResponse) Field2DeepEqual(src *model.SimpleUserList) bool {
+func (p *QueryFansListResponse) Field2DeepEqual(src *model.SimpleUserList) bool {
 
 	if !p.Data.DeepEqual(src) {
 		return false
@@ -2045,7 +2045,7 @@ type SocializeService interface {
 
 	QueryFollowList(ctx context.Context, req *QueryFollowListRequest) (r *QueryFollowListResponse, err error)
 
-	QueryFollowerList(ctx context.Context, req *QueryFollowerListRequest) (r *QueryFollowerListResponse, err error)
+	QueryFansList(ctx context.Context, req *QueryFansListRequest) (r *QueryFansListResponse, err error)
 
 	QueryFriendList(ctx context.Context, req *QueryFriendListRequest) (r *QueryFriendListResponse, err error)
 }
@@ -2734,38 +2734,38 @@ func (p *SocializeServiceQueryFollowListResult) Field0DeepEqual(src *QueryFollow
 	return true
 }
 
-type SocializeServiceQueryFollowerListArgs struct {
-	Req *QueryFollowerListRequest `thrift:"req,1" frugal:"1,default,QueryFollowerListRequest" json:"req"`
+type SocializeServiceQueryFansListArgs struct {
+	Req *QueryFansListRequest `thrift:"req,1" frugal:"1,default,QueryFansListRequest" json:"req"`
 }
 
-func NewSocializeServiceQueryFollowerListArgs() *SocializeServiceQueryFollowerListArgs {
-	return &SocializeServiceQueryFollowerListArgs{}
+func NewSocializeServiceQueryFansListArgs() *SocializeServiceQueryFansListArgs {
+	return &SocializeServiceQueryFansListArgs{}
 }
 
-func (p *SocializeServiceQueryFollowerListArgs) InitDefault() {
+func (p *SocializeServiceQueryFansListArgs) InitDefault() {
 }
 
-var SocializeServiceQueryFollowerListArgs_Req_DEFAULT *QueryFollowerListRequest
+var SocializeServiceQueryFansListArgs_Req_DEFAULT *QueryFansListRequest
 
-func (p *SocializeServiceQueryFollowerListArgs) GetReq() (v *QueryFollowerListRequest) {
+func (p *SocializeServiceQueryFansListArgs) GetReq() (v *QueryFansListRequest) {
 	if !p.IsSetReq() {
-		return SocializeServiceQueryFollowerListArgs_Req_DEFAULT
+		return SocializeServiceQueryFansListArgs_Req_DEFAULT
 	}
 	return p.Req
 }
-func (p *SocializeServiceQueryFollowerListArgs) SetReq(val *QueryFollowerListRequest) {
+func (p *SocializeServiceQueryFansListArgs) SetReq(val *QueryFansListRequest) {
 	p.Req = val
 }
 
-var fieldIDToName_SocializeServiceQueryFollowerListArgs = map[int16]string{
+var fieldIDToName_SocializeServiceQueryFansListArgs = map[int16]string{
 	1: "req",
 }
 
-func (p *SocializeServiceQueryFollowerListArgs) IsSetReq() bool {
+func (p *SocializeServiceQueryFansListArgs) IsSetReq() bool {
 	return p.Req != nil
 }
 
-func (p *SocializeServiceQueryFollowerListArgs) Read(iprot thrift.TProtocol) (err error) {
+func (p *SocializeServiceQueryFansListArgs) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -2811,7 +2811,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_SocializeServiceQueryFollowerListArgs[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_SocializeServiceQueryFansListArgs[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -2821,8 +2821,8 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *SocializeServiceQueryFollowerListArgs) ReadField1(iprot thrift.TProtocol) error {
-	_field := NewQueryFollowerListRequest()
+func (p *SocializeServiceQueryFansListArgs) ReadField1(iprot thrift.TProtocol) error {
+	_field := NewQueryFansListRequest()
 	if err := _field.Read(iprot); err != nil {
 		return err
 	}
@@ -2830,10 +2830,10 @@ func (p *SocializeServiceQueryFollowerListArgs) ReadField1(iprot thrift.TProtoco
 	return nil
 }
 
-func (p *SocializeServiceQueryFollowerListArgs) Write(oprot thrift.TProtocol) (err error) {
+func (p *SocializeServiceQueryFansListArgs) Write(oprot thrift.TProtocol) (err error) {
 
 	var fieldId int16
-	if err = oprot.WriteStructBegin("QueryFollowerList_args"); err != nil {
+	if err = oprot.WriteStructBegin("QueryFansList_args"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -2859,7 +2859,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *SocializeServiceQueryFollowerListArgs) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *SocializeServiceQueryFansListArgs) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -2876,15 +2876,15 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *SocializeServiceQueryFollowerListArgs) String() string {
+func (p *SocializeServiceQueryFansListArgs) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("SocializeServiceQueryFollowerListArgs(%+v)", *p)
+	return fmt.Sprintf("SocializeServiceQueryFansListArgs(%+v)", *p)
 
 }
 
-func (p *SocializeServiceQueryFollowerListArgs) DeepEqual(ano *SocializeServiceQueryFollowerListArgs) bool {
+func (p *SocializeServiceQueryFansListArgs) DeepEqual(ano *SocializeServiceQueryFansListArgs) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -2896,7 +2896,7 @@ func (p *SocializeServiceQueryFollowerListArgs) DeepEqual(ano *SocializeServiceQ
 	return true
 }
 
-func (p *SocializeServiceQueryFollowerListArgs) Field1DeepEqual(src *QueryFollowerListRequest) bool {
+func (p *SocializeServiceQueryFansListArgs) Field1DeepEqual(src *QueryFansListRequest) bool {
 
 	if !p.Req.DeepEqual(src) {
 		return false
@@ -2904,38 +2904,38 @@ func (p *SocializeServiceQueryFollowerListArgs) Field1DeepEqual(src *QueryFollow
 	return true
 }
 
-type SocializeServiceQueryFollowerListResult struct {
-	Success *QueryFollowerListResponse `thrift:"success,0,optional" frugal:"0,optional,QueryFollowerListResponse" json:"success,omitempty"`
+type SocializeServiceQueryFansListResult struct {
+	Success *QueryFansListResponse `thrift:"success,0,optional" frugal:"0,optional,QueryFansListResponse" json:"success,omitempty"`
 }
 
-func NewSocializeServiceQueryFollowerListResult() *SocializeServiceQueryFollowerListResult {
-	return &SocializeServiceQueryFollowerListResult{}
+func NewSocializeServiceQueryFansListResult() *SocializeServiceQueryFansListResult {
+	return &SocializeServiceQueryFansListResult{}
 }
 
-func (p *SocializeServiceQueryFollowerListResult) InitDefault() {
+func (p *SocializeServiceQueryFansListResult) InitDefault() {
 }
 
-var SocializeServiceQueryFollowerListResult_Success_DEFAULT *QueryFollowerListResponse
+var SocializeServiceQueryFansListResult_Success_DEFAULT *QueryFansListResponse
 
-func (p *SocializeServiceQueryFollowerListResult) GetSuccess() (v *QueryFollowerListResponse) {
+func (p *SocializeServiceQueryFansListResult) GetSuccess() (v *QueryFansListResponse) {
 	if !p.IsSetSuccess() {
-		return SocializeServiceQueryFollowerListResult_Success_DEFAULT
+		return SocializeServiceQueryFansListResult_Success_DEFAULT
 	}
 	return p.Success
 }
-func (p *SocializeServiceQueryFollowerListResult) SetSuccess(x interface{}) {
-	p.Success = x.(*QueryFollowerListResponse)
+func (p *SocializeServiceQueryFansListResult) SetSuccess(x interface{}) {
+	p.Success = x.(*QueryFansListResponse)
 }
 
-var fieldIDToName_SocializeServiceQueryFollowerListResult = map[int16]string{
+var fieldIDToName_SocializeServiceQueryFansListResult = map[int16]string{
 	0: "success",
 }
 
-func (p *SocializeServiceQueryFollowerListResult) IsSetSuccess() bool {
+func (p *SocializeServiceQueryFansListResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
-func (p *SocializeServiceQueryFollowerListResult) Read(iprot thrift.TProtocol) (err error) {
+func (p *SocializeServiceQueryFansListResult) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -2981,7 +2981,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_SocializeServiceQueryFollowerListResult[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_SocializeServiceQueryFansListResult[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -2991,8 +2991,8 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *SocializeServiceQueryFollowerListResult) ReadField0(iprot thrift.TProtocol) error {
-	_field := NewQueryFollowerListResponse()
+func (p *SocializeServiceQueryFansListResult) ReadField0(iprot thrift.TProtocol) error {
+	_field := NewQueryFansListResponse()
 	if err := _field.Read(iprot); err != nil {
 		return err
 	}
@@ -3000,10 +3000,10 @@ func (p *SocializeServiceQueryFollowerListResult) ReadField0(iprot thrift.TProto
 	return nil
 }
 
-func (p *SocializeServiceQueryFollowerListResult) Write(oprot thrift.TProtocol) (err error) {
+func (p *SocializeServiceQueryFansListResult) Write(oprot thrift.TProtocol) (err error) {
 
 	var fieldId int16
-	if err = oprot.WriteStructBegin("QueryFollowerList_result"); err != nil {
+	if err = oprot.WriteStructBegin("QueryFansList_result"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -3029,7 +3029,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *SocializeServiceQueryFollowerListResult) writeField0(oprot thrift.TProtocol) (err error) {
+func (p *SocializeServiceQueryFansListResult) writeField0(oprot thrift.TProtocol) (err error) {
 	if p.IsSetSuccess() {
 		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
 			goto WriteFieldBeginError
@@ -3048,15 +3048,15 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
 }
 
-func (p *SocializeServiceQueryFollowerListResult) String() string {
+func (p *SocializeServiceQueryFansListResult) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("SocializeServiceQueryFollowerListResult(%+v)", *p)
+	return fmt.Sprintf("SocializeServiceQueryFansListResult(%+v)", *p)
 
 }
 
-func (p *SocializeServiceQueryFollowerListResult) DeepEqual(ano *SocializeServiceQueryFollowerListResult) bool {
+func (p *SocializeServiceQueryFansListResult) DeepEqual(ano *SocializeServiceQueryFansListResult) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -3068,7 +3068,7 @@ func (p *SocializeServiceQueryFollowerListResult) DeepEqual(ano *SocializeServic
 	return true
 }
 
-func (p *SocializeServiceQueryFollowerListResult) Field0DeepEqual(src *QueryFollowerListResponse) bool {
+func (p *SocializeServiceQueryFansListResult) Field0DeepEqual(src *QueryFansListResponse) bool {
 
 	if !p.Success.DeepEqual(src) {
 		return false

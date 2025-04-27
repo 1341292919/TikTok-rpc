@@ -69,3 +69,15 @@ struct BaseResp {
     1: required i64 code,          //请求返回的状态码
     2: required string msg,        //返回的消息
 }
+struct ChatMessage{
+    1:required string user_id,
+    2:required string target_id,
+    3:required string  content,
+    4:required string created_at,
+    5:required string id,
+    6:required i64 type,
+}
+struct ChatMessageList{
+    1: required list<ChatMessage>  items,
+    2: required i64 total,
+}

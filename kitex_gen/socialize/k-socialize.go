@@ -33,7 +33,7 @@ func (p *FollowRequest) FastRead(buf []byte) (int, error) {
 	var l int
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetToUserId bool = false
+	var issetTargetUserId bool = false
 	var issetActionType bool = false
 	var issetUserId bool = false
 	for {
@@ -53,7 +53,7 @@ func (p *FollowRequest) FastRead(buf []byte) (int, error) {
 				if err != nil {
 					goto ReadFieldError
 				}
-				issetToUserId = true
+				issetTargetUserId = true
 			} else {
 				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
 				offset += l
@@ -100,7 +100,7 @@ func (p *FollowRequest) FastRead(buf []byte) (int, error) {
 		}
 	}
 
-	if !issetToUserId {
+	if !issetTargetUserId {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -135,7 +135,7 @@ func (p *FollowRequest) FastReadField1(buf []byte) (int, error) {
 		offset += l
 		_field = v
 	}
-	p.ToUserId = _field
+	p.TargetUserId = _field
 	return offset, nil
 }
 
@@ -196,7 +196,7 @@ func (p *FollowRequest) BLength() int {
 func (p *FollowRequest) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 1)
-	offset += thrift.Binary.WriteI64(buf[offset:], p.ToUserId)
+	offset += thrift.Binary.WriteI64(buf[offset:], p.TargetUserId)
 	return offset
 }
 
@@ -684,7 +684,7 @@ func (p *QueryFollowListResponse) field2Length() int {
 	return l
 }
 
-func (p *QueryFollowerListRequest) FastRead(buf []byte) (int, error) {
+func (p *QueryFansListRequest) FastRead(buf []byte) (int, error) {
 
 	var err error
 	var offset int
@@ -776,14 +776,14 @@ func (p *QueryFollowerListRequest) FastRead(buf []byte) (int, error) {
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_QueryFollowerListRequest[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_QueryFansListRequest[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 RequiredFieldNotSetError:
-	return offset, thrift.NewProtocolException(thrift.INVALID_DATA, fmt.Sprintf("required field %s is not set", fieldIDToName_QueryFollowerListRequest[fieldId]))
+	return offset, thrift.NewProtocolException(thrift.INVALID_DATA, fmt.Sprintf("required field %s is not set", fieldIDToName_QueryFansListRequest[fieldId]))
 }
 
-func (p *QueryFollowerListRequest) FastReadField1(buf []byte) (int, error) {
+func (p *QueryFansListRequest) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
 	var _field int64
@@ -797,7 +797,7 @@ func (p *QueryFollowerListRequest) FastReadField1(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *QueryFollowerListRequest) FastReadField2(buf []byte) (int, error) {
+func (p *QueryFansListRequest) FastReadField2(buf []byte) (int, error) {
 	offset := 0
 
 	var _field int64
@@ -811,7 +811,7 @@ func (p *QueryFollowerListRequest) FastReadField2(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *QueryFollowerListRequest) FastReadField3(buf []byte) (int, error) {
+func (p *QueryFansListRequest) FastReadField3(buf []byte) (int, error) {
 	offset := 0
 
 	var _field int64
@@ -825,11 +825,11 @@ func (p *QueryFollowerListRequest) FastReadField3(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *QueryFollowerListRequest) FastWrite(buf []byte) int {
+func (p *QueryFansListRequest) FastWrite(buf []byte) int {
 	return p.FastWriteNocopy(buf, nil)
 }
 
-func (p *QueryFollowerListRequest) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
+func (p *QueryFansListRequest) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], w)
@@ -840,7 +840,7 @@ func (p *QueryFollowerListRequest) FastWriteNocopy(buf []byte, w thrift.NocopyWr
 	return offset
 }
 
-func (p *QueryFollowerListRequest) BLength() int {
+func (p *QueryFansListRequest) BLength() int {
 	l := 0
 	if p != nil {
 		l += p.field1Length()
@@ -851,49 +851,49 @@ func (p *QueryFollowerListRequest) BLength() int {
 	return l
 }
 
-func (p *QueryFollowerListRequest) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
+func (p *QueryFansListRequest) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 1)
 	offset += thrift.Binary.WriteI64(buf[offset:], p.UserId)
 	return offset
 }
 
-func (p *QueryFollowerListRequest) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
+func (p *QueryFansListRequest) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 2)
 	offset += thrift.Binary.WriteI64(buf[offset:], p.PageSize)
 	return offset
 }
 
-func (p *QueryFollowerListRequest) fastWriteField3(buf []byte, w thrift.NocopyWriter) int {
+func (p *QueryFansListRequest) fastWriteField3(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I64, 3)
 	offset += thrift.Binary.WriteI64(buf[offset:], p.PageNum)
 	return offset
 }
 
-func (p *QueryFollowerListRequest) field1Length() int {
+func (p *QueryFansListRequest) field1Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += thrift.Binary.I64Length()
 	return l
 }
 
-func (p *QueryFollowerListRequest) field2Length() int {
+func (p *QueryFansListRequest) field2Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += thrift.Binary.I64Length()
 	return l
 }
 
-func (p *QueryFollowerListRequest) field3Length() int {
+func (p *QueryFansListRequest) field3Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += thrift.Binary.I64Length()
 	return l
 }
 
-func (p *QueryFollowerListResponse) FastRead(buf []byte) (int, error) {
+func (p *QueryFansListResponse) FastRead(buf []byte) (int, error) {
 
 	var err error
 	var offset int
@@ -951,12 +951,12 @@ func (p *QueryFollowerListResponse) FastRead(buf []byte) (int, error) {
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_QueryFollowerListResponse[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_QueryFansListResponse[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 }
 
-func (p *QueryFollowerListResponse) FastReadField1(buf []byte) (int, error) {
+func (p *QueryFansListResponse) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 	_field := model.NewBaseResp()
 	if l, err := _field.FastRead(buf[offset:]); err != nil {
@@ -968,7 +968,7 @@ func (p *QueryFollowerListResponse) FastReadField1(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *QueryFollowerListResponse) FastReadField2(buf []byte) (int, error) {
+func (p *QueryFansListResponse) FastReadField2(buf []byte) (int, error) {
 	offset := 0
 	_field := model.NewSimpleUserList()
 	if l, err := _field.FastRead(buf[offset:]); err != nil {
@@ -980,11 +980,11 @@ func (p *QueryFollowerListResponse) FastReadField2(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *QueryFollowerListResponse) FastWrite(buf []byte) int {
+func (p *QueryFansListResponse) FastWrite(buf []byte) int {
 	return p.FastWriteNocopy(buf, nil)
 }
 
-func (p *QueryFollowerListResponse) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
+func (p *QueryFansListResponse) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], w)
@@ -994,7 +994,7 @@ func (p *QueryFollowerListResponse) FastWriteNocopy(buf []byte, w thrift.NocopyW
 	return offset
 }
 
-func (p *QueryFollowerListResponse) BLength() int {
+func (p *QueryFansListResponse) BLength() int {
 	l := 0
 	if p != nil {
 		l += p.field1Length()
@@ -1004,14 +1004,14 @@ func (p *QueryFollowerListResponse) BLength() int {
 	return l
 }
 
-func (p *QueryFollowerListResponse) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
+func (p *QueryFansListResponse) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 1)
 	offset += p.Base.FastWriteNocopy(buf[offset:], w)
 	return offset
 }
 
-func (p *QueryFollowerListResponse) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
+func (p *QueryFansListResponse) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p.IsSetData() {
 		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 2)
@@ -1020,14 +1020,14 @@ func (p *QueryFollowerListResponse) fastWriteField2(buf []byte, w thrift.NocopyW
 	return offset
 }
 
-func (p *QueryFollowerListResponse) field1Length() int {
+func (p *QueryFansListResponse) field1Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += p.Base.BLength()
 	return l
 }
 
-func (p *QueryFollowerListResponse) field2Length() int {
+func (p *QueryFansListResponse) field2Length() int {
 	l := 0
 	if p.IsSetData() {
 		l += thrift.Binary.FieldBeginLength()
@@ -1733,7 +1733,7 @@ func (p *SocializeServiceQueryFollowListResult) field0Length() int {
 	return l
 }
 
-func (p *SocializeServiceQueryFollowerListArgs) FastRead(buf []byte) (int, error) {
+func (p *SocializeServiceQueryFansListArgs) FastRead(buf []byte) (int, error) {
 
 	var err error
 	var offset int
@@ -1777,14 +1777,14 @@ func (p *SocializeServiceQueryFollowerListArgs) FastRead(buf []byte) (int, error
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_SocializeServiceQueryFollowerListArgs[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_SocializeServiceQueryFansListArgs[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 }
 
-func (p *SocializeServiceQueryFollowerListArgs) FastReadField1(buf []byte) (int, error) {
+func (p *SocializeServiceQueryFansListArgs) FastReadField1(buf []byte) (int, error) {
 	offset := 0
-	_field := NewQueryFollowerListRequest()
+	_field := NewQueryFansListRequest()
 	if l, err := _field.FastRead(buf[offset:]); err != nil {
 		return offset, err
 	} else {
@@ -1794,11 +1794,11 @@ func (p *SocializeServiceQueryFollowerListArgs) FastReadField1(buf []byte) (int,
 	return offset, nil
 }
 
-func (p *SocializeServiceQueryFollowerListArgs) FastWrite(buf []byte) int {
+func (p *SocializeServiceQueryFansListArgs) FastWrite(buf []byte) int {
 	return p.FastWriteNocopy(buf, nil)
 }
 
-func (p *SocializeServiceQueryFollowerListArgs) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
+func (p *SocializeServiceQueryFansListArgs) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], w)
@@ -1807,7 +1807,7 @@ func (p *SocializeServiceQueryFollowerListArgs) FastWriteNocopy(buf []byte, w th
 	return offset
 }
 
-func (p *SocializeServiceQueryFollowerListArgs) BLength() int {
+func (p *SocializeServiceQueryFansListArgs) BLength() int {
 	l := 0
 	if p != nil {
 		l += p.field1Length()
@@ -1816,21 +1816,21 @@ func (p *SocializeServiceQueryFollowerListArgs) BLength() int {
 	return l
 }
 
-func (p *SocializeServiceQueryFollowerListArgs) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
+func (p *SocializeServiceQueryFansListArgs) fastWriteField1(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 1)
 	offset += p.Req.FastWriteNocopy(buf[offset:], w)
 	return offset
 }
 
-func (p *SocializeServiceQueryFollowerListArgs) field1Length() int {
+func (p *SocializeServiceQueryFansListArgs) field1Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += p.Req.BLength()
 	return l
 }
 
-func (p *SocializeServiceQueryFollowerListResult) FastRead(buf []byte) (int, error) {
+func (p *SocializeServiceQueryFansListResult) FastRead(buf []byte) (int, error) {
 
 	var err error
 	var offset int
@@ -1874,14 +1874,14 @@ func (p *SocializeServiceQueryFollowerListResult) FastRead(buf []byte) (int, err
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_SocializeServiceQueryFollowerListResult[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_SocializeServiceQueryFansListResult[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 }
 
-func (p *SocializeServiceQueryFollowerListResult) FastReadField0(buf []byte) (int, error) {
+func (p *SocializeServiceQueryFansListResult) FastReadField0(buf []byte) (int, error) {
 	offset := 0
-	_field := NewQueryFollowerListResponse()
+	_field := NewQueryFansListResponse()
 	if l, err := _field.FastRead(buf[offset:]); err != nil {
 		return offset, err
 	} else {
@@ -1891,11 +1891,11 @@ func (p *SocializeServiceQueryFollowerListResult) FastReadField0(buf []byte) (in
 	return offset, nil
 }
 
-func (p *SocializeServiceQueryFollowerListResult) FastWrite(buf []byte) int {
+func (p *SocializeServiceQueryFansListResult) FastWrite(buf []byte) int {
 	return p.FastWriteNocopy(buf, nil)
 }
 
-func (p *SocializeServiceQueryFollowerListResult) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
+func (p *SocializeServiceQueryFansListResult) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p != nil {
 		offset += p.fastWriteField0(buf[offset:], w)
@@ -1904,7 +1904,7 @@ func (p *SocializeServiceQueryFollowerListResult) FastWriteNocopy(buf []byte, w 
 	return offset
 }
 
-func (p *SocializeServiceQueryFollowerListResult) BLength() int {
+func (p *SocializeServiceQueryFansListResult) BLength() int {
 	l := 0
 	if p != nil {
 		l += p.field0Length()
@@ -1913,7 +1913,7 @@ func (p *SocializeServiceQueryFollowerListResult) BLength() int {
 	return l
 }
 
-func (p *SocializeServiceQueryFollowerListResult) fastWriteField0(buf []byte, w thrift.NocopyWriter) int {
+func (p *SocializeServiceQueryFansListResult) fastWriteField0(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p.IsSetSuccess() {
 		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRUCT, 0)
@@ -1922,7 +1922,7 @@ func (p *SocializeServiceQueryFollowerListResult) fastWriteField0(buf []byte, w 
 	return offset
 }
 
-func (p *SocializeServiceQueryFollowerListResult) field0Length() int {
+func (p *SocializeServiceQueryFansListResult) field0Length() int {
 	l := 0
 	if p.IsSetSuccess() {
 		l += thrift.Binary.FieldBeginLength()
@@ -2145,11 +2145,11 @@ func (p *SocializeServiceQueryFollowListResult) GetResult() interface{} {
 	return p.Success
 }
 
-func (p *SocializeServiceQueryFollowerListArgs) GetFirstArgument() interface{} {
+func (p *SocializeServiceQueryFansListArgs) GetFirstArgument() interface{} {
 	return p.Req
 }
 
-func (p *SocializeServiceQueryFollowerListResult) GetResult() interface{} {
+func (p *SocializeServiceQueryFansListResult) GetResult() interface{} {
 	return p.Success
 }
 

@@ -5,6 +5,7 @@ import (
 	"TikTok-rpc/kitex_gen/socialize/socializeservice"
 	"TikTok-rpc/kitex_gen/user/userservice"
 	"TikTok-rpc/kitex_gen/video/videoservice"
+	"TikTok-rpc/kitex_gen/websocket/websocketservice"
 )
 
 // 全局变量
@@ -13,6 +14,7 @@ var (
 	videoClient     videoservice.Client
 	interactClient  interactservice.Client
 	socializeClient socializeservice.Client
+	websocketClient websocketservice.Client
 )
 
 func Init() {
@@ -20,4 +22,5 @@ func Init() {
 	InitVideoRPC()
 	InitSocializeRPC()
 	InitInteractRPC()
+	InitWebsocketRPC()
 }
