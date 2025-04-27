@@ -41,6 +41,17 @@ struct Comment{
     9: required i64 like_count,
     10: required i64 child_count,
 }
+struct Message{
+    1:required string user_id,
+    2:required string content,
+    3:required string created_at,
+    4:required string target_id,
+    5:required i64 type,
+}
+struct MessageList{
+    1: required list<Message> items,
+    2: required i64 total,
+}
 
 struct SimpleUserList{
      1: required list<SimpleUser> items,

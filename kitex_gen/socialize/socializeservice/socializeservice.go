@@ -27,10 +27,10 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
-	"QueryFollowerList": kitex.NewMethodInfo(
-		queryFollowerListHandler,
-		newSocializeServiceQueryFollowerListArgs,
-		newSocializeServiceQueryFollowerListResult,
+	"QueryFansList": kitex.NewMethodInfo(
+		queryFansListHandler,
+		newSocializeServiceQueryFansListArgs,
+		newSocializeServiceQueryFansListResult,
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
@@ -143,22 +143,22 @@ func newSocializeServiceQueryFollowListResult() interface{} {
 	return socialize.NewSocializeServiceQueryFollowListResult()
 }
 
-func queryFollowerListHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*socialize.SocializeServiceQueryFollowerListArgs)
-	realResult := result.(*socialize.SocializeServiceQueryFollowerListResult)
-	success, err := handler.(socialize.SocializeService).QueryFollowerList(ctx, realArg.Req)
+func queryFansListHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*socialize.SocializeServiceQueryFansListArgs)
+	realResult := result.(*socialize.SocializeServiceQueryFansListResult)
+	success, err := handler.(socialize.SocializeService).QueryFansList(ctx, realArg.Req)
 	if err != nil {
 		return err
 	}
 	realResult.Success = success
 	return nil
 }
-func newSocializeServiceQueryFollowerListArgs() interface{} {
-	return socialize.NewSocializeServiceQueryFollowerListArgs()
+func newSocializeServiceQueryFansListArgs() interface{} {
+	return socialize.NewSocializeServiceQueryFansListArgs()
 }
 
-func newSocializeServiceQueryFollowerListResult() interface{} {
-	return socialize.NewSocializeServiceQueryFollowerListResult()
+func newSocializeServiceQueryFansListResult() interface{} {
+	return socialize.NewSocializeServiceQueryFansListResult()
 }
 
 func queryFriendListHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -209,11 +209,11 @@ func (p *kClient) QueryFollowList(ctx context.Context, req *socialize.QueryFollo
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) QueryFollowerList(ctx context.Context, req *socialize.QueryFollowerListRequest) (r *socialize.QueryFollowerListResponse, err error) {
-	var _args socialize.SocializeServiceQueryFollowerListArgs
+func (p *kClient) QueryFansList(ctx context.Context, req *socialize.QueryFansListRequest) (r *socialize.QueryFansListResponse, err error) {
+	var _args socialize.SocializeServiceQueryFansListArgs
 	_args.Req = req
-	var _result socialize.SocializeServiceQueryFollowerListResult
-	if err = p.c.Call(ctx, "QueryFollowerList", &_args, &_result); err != nil {
+	var _result socialize.SocializeServiceQueryFansListResult
+	if err = p.c.Call(ctx, "QueryFansList", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

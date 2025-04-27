@@ -13,7 +13,7 @@ import (
 type Client interface {
 	Follow(ctx context.Context, req *socialize.FollowRequest, callOptions ...callopt.Option) (r *socialize.FollowResponse, err error)
 	QueryFollowList(ctx context.Context, req *socialize.QueryFollowListRequest, callOptions ...callopt.Option) (r *socialize.QueryFollowListResponse, err error)
-	QueryFollowerList(ctx context.Context, req *socialize.QueryFollowerListRequest, callOptions ...callopt.Option) (r *socialize.QueryFollowerListResponse, err error)
+	QueryFansList(ctx context.Context, req *socialize.QueryFansListRequest, callOptions ...callopt.Option) (r *socialize.QueryFansListResponse, err error)
 	QueryFriendList(ctx context.Context, req *socialize.QueryFriendListRequest, callOptions ...callopt.Option) (r *socialize.QueryFriendListResponse, err error)
 }
 
@@ -56,9 +56,9 @@ func (p *kSocializeServiceClient) QueryFollowList(ctx context.Context, req *soci
 	return p.kClient.QueryFollowList(ctx, req)
 }
 
-func (p *kSocializeServiceClient) QueryFollowerList(ctx context.Context, req *socialize.QueryFollowerListRequest, callOptions ...callopt.Option) (r *socialize.QueryFollowerListResponse, err error) {
+func (p *kSocializeServiceClient) QueryFansList(ctx context.Context, req *socialize.QueryFansListRequest, callOptions ...callopt.Option) (r *socialize.QueryFansListResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.QueryFollowerList(ctx, req)
+	return p.kClient.QueryFansList(ctx, req)
 }
 
 func (p *kSocializeServiceClient) QueryFriendList(ctx context.Context, req *socialize.QueryFriendListRequest, callOptions ...callopt.Option) (r *socialize.QueryFriendListResponse, err error) {
