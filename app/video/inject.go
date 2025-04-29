@@ -9,15 +9,20 @@ import (
 	"TikTok-rpc/app/video/usecase"
 	"TikTok-rpc/kitex_gen/video"
 	"TikTok-rpc/pkg/base/client"
+	"TikTok-rpc/pkg/constants"
 	"github.com/bytedance/gopkg/util/logger"
 )
 
 func InjectVideoHandler() video.VideoService {
-	gormDB, err := mysql.InitMySQL()
+	gormDB, err := client.InitMySQL()
 	if err != nil {
 		panic(err)
 	}
-	videoRd, videoIdRd, err := cache.Init()
+	videoRd, err := client.NewRedisClient(constants.RedisDBVideo)
+	if err != nil {
+		panic(err)
+	}
+	videoIdRd, err := client.NewRedisClient(constants.RedisDBVideo)
 	if err != nil {
 		panic(err)
 	}

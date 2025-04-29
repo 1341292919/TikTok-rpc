@@ -3,8 +3,10 @@ package main
 import (
 	"TikTok-rpc/app/interact"
 	"TikTok-rpc/app/interact/domain/service"
+	"TikTok-rpc/config"
 	interactservice "TikTok-rpc/kitex_gen/interact/interactservice"
 	"TikTok-rpc/pkg/constants"
+	"TikTok-rpc/pkg/utils"
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
@@ -15,14 +17,22 @@ import (
 
 var serviceName = constants.InteractServiceName
 
+func init() {
+	config.Init(serviceName)
+}
+
 func main() {
-	r, err := etcd.NewEtcdRegistry([]string{constants.VideoETCD})
+	r, err := etcd.NewEtcdRegistry([]string{config.Etcd.Addr})
 	if err != nil {
-		logger.Fatalf("Video: new etcd registry failed, err: %v", err)
+		logger.Fatalf("Interact: new etcd registry failed, err: %v", err)
 	}
-	addr, err := net.ResolveTCPAddr("tcp", "0.0.0.0:9997") // 服务监听端口
+	listenAddr, err := utils.GetAvailablePort()
 	if err != nil {
-		logger.Fatalf("User: resolve tcp addr failed, err: %v", err)
+		logger.Fatalf("Interact: get available port failed, err: %v", err)
+	}
+	addr, err := net.ResolveTCPAddr("tcp", listenAddr) // 服务监听端口
+	if err != nil {
+		logger.Fatalf("Interact: resolve tcp addr failed, err: %v", err)
 	}
 	svr := interactservice.NewServer(
 		//只能注入一个handler

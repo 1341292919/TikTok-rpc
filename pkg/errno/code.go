@@ -25,6 +25,8 @@ const (
 	ServiceUserPasswordError
 	ServiceVideoNotExist
 	ServiceCommentNotExist
+	ServiceRepeatOperation
+	ServiceNoAuthority
 )
 
 const (
@@ -32,4 +34,6 @@ const (
 	InterFileProcessErrorCode                //文件处理错误
 	InternalDatabaseErrorCode
 	InternalRedisErrorCode // Redis错误
+	InternalRPCErrorCode   //
+	InternalWebSocketError
 )

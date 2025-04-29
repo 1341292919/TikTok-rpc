@@ -13,4 +13,5 @@ var (
 	AuthNoToken        = NewErrNo(AuthNoTokenCode, "lack of token")
 
 	UserIdMissingError = NewErrNo(InternalServiceErrorCode, "get Userid from context failed")
+	WebSocketError     = NewErrNo(InternalWebSocketError, "websocket error")
 )

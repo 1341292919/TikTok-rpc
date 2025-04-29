@@ -9,19 +9,20 @@ import (
 	"TikTok-rpc/app/interact/usecase"
 	"TikTok-rpc/kitex_gen/interact"
 	"TikTok-rpc/pkg/base/client"
+	"TikTok-rpc/pkg/constants"
 	"github.com/bytedance/gopkg/util/logger"
 )
 
 func InjectInteractHandler() interact.InteractService {
-	gormDB, err := mysql.InitMySQL()
+	gormDB, err := client.InitMySQL()
 	if err != nil {
 		panic(err)
 	}
-	Ulike, Lcount, err := cache.InitCache()
+	Ulike, err := client.NewRedisClient(constants.RedisDBInteract)
 	if err != nil {
 		panic(err)
 	}
-
+	Lcount, err := client.NewRedisClient(constants.RedisDBInteract)
 	db := mysql.NewInteractDB(gormDB)
 	ca := cache.NewInteractCache(Ulike, Lcount)
 	vClient, err := client.InitVideoRPC()

@@ -7,15 +7,17 @@ import (
 	"TikTok-rpc/app/websocket/infrastructure/mysql"
 	"TikTok-rpc/app/websocket/usecase"
 	"TikTok-rpc/kitex_gen/websocket"
+	"TikTok-rpc/pkg/base/client"
+	"TikTok-rpc/pkg/constants"
 	"github.com/bytedance/gopkg/util/logger"
 )
 
 func InjectWebsocketHandler() websocket.WebsocketService {
-	gormDB, err := mysql.InitMySQL()
+	gormDB, err := client.InitMySQL()
 	if err != nil {
 		panic(err)
 	}
-	m, err := cache.Init()
+	m, err := client.NewRedisClient(constants.RedisDBWebsocket)
 	if err != nil {
 		panic(err)
 	}

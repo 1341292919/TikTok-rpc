@@ -1,7 +1,7 @@
 package oss
 
 import (
-	"TikTok-rpc/pkg/constants"
+	"TikTok-rpc/config"
 	"TikTok-rpc/pkg/errno"
 	"bytes"
 	"context"
@@ -112,10 +112,10 @@ func Upload(localFile, filename, userid, origin string) (string, error) {
 	key := fmt.Sprintf("%s/%s/%s", origin, userid, filename)
 
 	putPolicy := storage.PutPolicy{
-		Scope: constants.QiNiuBucket,
+		Scope: config.Oss.Bucket,
 	}
 
-	mac := auth.New(constants.QiNiuAccessKey, constants.QiNiuSecretKey)
+	mac := auth.New(config.Oss.AccessKey, config.Oss.SecretKey)
 	upToken := putPolicy.UploadToken(mac)
 
 	cfg := storage.Config{}
@@ -147,7 +147,7 @@ func Upload(localFile, filename, userid, origin string) (string, error) {
 	if err != nil {
 		return "", errno.Errorf(errno.InterFileProcessErrorCode, "remove file error")
 	}
-	return storage.MakePublicURL(constants.QiNiuDomain, ret.Key), nil
+	return storage.MakePublicURL(config.Oss.Domain, ret.Key), nil
 }
 
 // ExtractFirstFrame 从视频文件中提取第一帧作为封面图片
