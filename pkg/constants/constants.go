@@ -14,7 +14,7 @@ const (
 	InteractServiceName  = "interact"
 	WebsocketServiceName = "websocket"
 	GatewayServiceName   = "gateway"
-	SocializeServiceName = "socialize"
+	SocializeServiceName = "socialize "
 )
 
 // jwt
