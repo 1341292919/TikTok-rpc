@@ -6,18 +6,32 @@ import (
 	"TikTok-rpc/app/gateway/middleware/jwt"
 	websock "TikTok-rpc/app/gateway/router/api/websocket"
 	"TikTok-rpc/app/gateway/rpc"
+	"TikTok-rpc/config"
+	"TikTok-rpc/pkg/constants"
+	"TikTok-rpc/pkg/utils"
+	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
-func Init() {
+var serviceName = constants.GatewayServiceName
+
+func init() {
+	config.Init(serviceName)
 	rpc.Init()
 	jwt.Init()
 }
+
 func main() {
-	Init()
-	h := server.Default()
+	listenAddr, err := utils.GetAvailablePort()
+	if err != nil {
+		logger.Fatalf("get available port failed, err: %v", err)
+	}
+	h := server.New(
+		server.WithHostPorts(listenAddr),
+		server.WithHandleMethodNotAllowed(true),
+	)
 	register(h)
-	ws := server.Default(server.WithHostPorts("0.0.0.0:10000"))
+	ws := server.Default(server.WithHostPorts("127.0.0.1:10000"))
 	ws.NoHijackConnPool = true
 	websock.WebsocketRegister(ws)
 	go ws.Spin()

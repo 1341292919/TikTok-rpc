@@ -1,0 +1,53 @@
+mysql:
+  addr: 127.0.0.1:3306
+  database: test
+  username: test
+  password: test
+  charset: utf8mb4
+
+oss:
+  bucket: ""
+  accessKey: ""
+  secretKey:  ""
+  domain: ""
+
+redis:
+  addr: 127.0.0.1:6379
+  username: ""
+  password: ""
+
+etcd:
+  addr: 127.0.0.1:2379
+
+services:
+  gateway:
+    name : gateway
+    load-balance: true
+    addr:
+      - 127.0.0.1:10001
+      - 127.0.0.1:10000
+  user:
+    name: user
+    load-balance: false
+    addr:
+      - 127.0.0.1:10002
+  video:
+    name: video
+    load-balance: false
+    addr:
+      - 127.0.0.1:10003
+  interact:
+    name : interact
+    load-balance: false
+    addr:
+      - 127.0.0.1:10004
+  socialize:
+    name : socialize
+    load-balance: false
+    addr:
+      - 127.0.0.1:10005
+  websocket:
+    name : websocket
+    load-balance: false
+    addr:
+      - 127.0.0.1:10006

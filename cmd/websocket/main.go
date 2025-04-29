@@ -3,8 +3,10 @@ package main
 import (
 	"TikTok-rpc/app/websocket"
 	"TikTok-rpc/app/websocket/domain/service"
+	"TikTok-rpc/config"
 	"TikTok-rpc/kitex_gen/websocket/websocketservice"
 	"TikTok-rpc/pkg/constants"
+	"TikTok-rpc/pkg/utils"
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
@@ -15,12 +17,19 @@ import (
 
 var serviceName = constants.WebsocketServiceName
 
+func init() {
+	config.Init(serviceName)
+}
 func main() {
-	r, err := etcd.NewEtcdRegistry([]string{constants.UserETCD})
+	r, err := etcd.NewEtcdRegistry([]string{config.Etcd.Addr})
 	if err != nil {
 		logger.Fatalf("Websocket: new etcd registry failed, err: %v", err)
 	}
-	addr, err := net.ResolveTCPAddr("tcp", "0.0.0.0:9995") // 服务监听端口
+	listenAddr, err := utils.GetAvailablePort()
+	if err != nil {
+		logger.Fatalf("Websocket: get available port failed, err: %v", err)
+	}
+	addr, err := net.ResolveTCPAddr("tcp", listenAddr) // 服务监听端口
 	if err != nil {
 		logger.Fatalf("Websocketr: resolve tcp addr failed, err: %v", err)
 	}

@@ -209,6 +209,7 @@ func (db *interactDB) UpdateCommentCount(ctx context.Context, commentid, change 
 	}
 	return nil
 }
+
 func (db *interactDB) QueryCommentByParentId(ctx context.Context, req *model.InteractReq) ([]*model.Comment, error) {
 	var err error
 	var commentData []*Comment

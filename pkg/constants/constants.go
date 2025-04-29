@@ -23,14 +23,10 @@ const (
 // Service Name
 const (
 	UserServiceName      = "user"
-	UserETCD             = "127.0.0.1:2379"
 	VideoServiceName     = "video"
-	VideoETCD            = "127.0.0.1:2379"
 	InteractServiceName  = "interact"
-	InteractETCD         = "127.0.0.1:2379"
-	SocializeETCD        = "127.0.0.1:2379"
 	WebsocketServiceName = "websocket"
-	WebsocketETCD        = "127.0.0.1:2379"
+	GatewayServiceName   = "gateway"
 )
 
 // jwt
@@ -58,4 +54,9 @@ const (
 	TableFollower   = "user_follows"
 	TableUserLike   = "user_likes"
 	TableVideo      = "video"
+)
+const (
+	RedisDBVideo     = 0
+	RedisDBInteract  = 1
+	RedisDBWebsocket = 2
 )

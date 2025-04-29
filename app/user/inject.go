@@ -6,10 +6,11 @@ import (
 	"TikTok-rpc/app/user/infrastructure/mysql"
 	"TikTok-rpc/app/user/usecase"
 	"TikTok-rpc/kitex_gen/user"
+	"TikTok-rpc/pkg/base/client"
 )
 
 func InjectUserHandler() user.UserService {
-	gormDB, err := mysql.InitMySQL()
+	gormDB, err := client.InitMySQL()
 	if err != nil {
 		panic(err)
 	}

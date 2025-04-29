@@ -2,8 +2,10 @@ package main
 
 import (
 	"TikTok-rpc/app/video"
+	"TikTok-rpc/config"
 	"TikTok-rpc/kitex_gen/video/videoservice"
 	"TikTok-rpc/pkg/constants"
+	"TikTok-rpc/pkg/utils"
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
@@ -14,15 +16,21 @@ import (
 
 var serviceName = constants.VideoServiceName
 
+func init() {
+	config.Init(serviceName)
+}
 func main() {
-
-	r, err := etcd.NewEtcdRegistry([]string{constants.VideoETCD})
+	r, err := etcd.NewEtcdRegistry([]string{config.Etcd.Addr})
 	if err != nil {
 		logger.Fatalf("Video: new etcd registry failed, err: %v", err)
 	}
-	addr, err := net.ResolveTCPAddr("tcp", "0.0.0.0:9998") // 服务监听端口
+	listenAddr, err := utils.GetAvailablePort()
 	if err != nil {
-		logger.Fatalf("User: resolve tcp addr failed, err: %v", err)
+		logger.Fatalf("Video: get available port failed, err: %v", err)
+	}
+	addr, err := net.ResolveTCPAddr("tcp", listenAddr) // 服务监听端口
+	if err != nil {
+		logger.Fatalf("Video: resolve tcp addr failed, err: %v", err)
 	}
 	svr := videoservice.NewServer(
 		//只能注入一个handler
