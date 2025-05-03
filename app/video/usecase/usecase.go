@@ -16,6 +16,7 @@ type VideoUseCase interface {
 	QueryVideoByID(ctx context.Context, videoid int64) (*model.Video, error)
 	UpdateCommentCount(ctx context.Context, videoid, ccount int64) (err error)
 	UpdateLikeCount(ctx context.Context, videoid, lcount int64) (err error)
+	QueryLikeCount(ctx context.Context) ([]*model.LikeCount, error)
 }
 
 type useCase struct {

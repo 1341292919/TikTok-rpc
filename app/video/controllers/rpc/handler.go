@@ -164,3 +164,14 @@ func (s *VideoServiceImpl) UpdateLikeCount(ctx context.Context, req *video.Updat
 	resp.Base = pack.BuildBaseResp(errno.Success)
 	return
 }
+func (s *VideoServiceImpl) QueryLikeCount(ctx context.Context, req *video.QueryLikeCountRequest) (resp *video.QueryLikeCountResponse, err error) {
+	resp = new(video.QueryLikeCountResponse)
+	data, e := s.useCase.QueryLikeCount(ctx)
+	if e != nil {
+		resp.Base = pack.BuildBaseResp(errno.ConvertErr(e))
+		return
+	}
+	resp.Data = pack.BuildLikeCountList(data)
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	return
+}

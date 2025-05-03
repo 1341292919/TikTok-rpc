@@ -3,73 +3,111 @@
 package socialize
 
 import (
+	api "TikTok-rpc/app/gateway/model/api/socialize"
+	"TikTok-rpc/app/gateway/pack"
+	"TikTok-rpc/app/gateway/rpc"
+	"TikTok-rpc/app/gateway/service"
+	"TikTok-rpc/kitex_gen/socialize"
+	"TikTok-rpc/pkg/errno"
 	"context"
-
-	socialize "TikTok-rpc/app/gateway/model/api/socialize"
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
 // Follow .
 // @router /relation/action [POST]
 func Follow(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req socialize.FollowRequest
+	var req api.FollowRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
 		return
 	}
 
-	resp := new(socialize.FollowResponse)
+	resp := new(api.FollowResponse)
+	uid := service.GetUserIDFromContext(c)
+	err = rpc.FollowRPC(ctx, &socialize.FollowRequest{
+		TargetUserId: req.TargetUserID,
+		UserId:       uid,
+		ActionType:   req.ActionType,
+	})
+	if err != nil {
+		pack.SendFailResponse(c, errno.ConvertErr(err))
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
 }
 
 // QueryFollowList .
 // @router /following/list [GET]
 func QueryFollowList(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req socialize.QueryFollowListRequest
+	var req api.QueryFollowListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
 		return
 	}
 
-	resp := new(socialize.QueryFollowListResponse)
-
-	c.JSON(consts.StatusOK, resp)
-}
-
-// QueryFollowerList .
-// @router /follower/list [GET]
-func QueryFollowerList(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req socialize.QueryFollowerListRequest
-	err = c.BindAndValidate(&req)
+	resp := new(api.QueryFollowListResponse)
+	resp, err = rpc.QueryFollowList(ctx, &socialize.QueryFollowListRequest{
+		UserId:   req.UserID,
+		PageSize: req.PageSize,
+		PageNum:  req.PageNum,
+	})
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.SendFailResponse(c, errno.ConvertErr(err))
 		return
 	}
-
-	resp := new(socialize.QueryFollowerListResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
 }
 
 // QueryFriendList .
 // @router /friends/list [GET]
 func QueryFriendList(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req socialize.QueryFriendListRequest
+	var req api.QueryFriendListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
 		return
 	}
 
-	resp := new(socialize.QueryFriendListResponse)
+	resp := new(api.QueryFriendListResponse)
+	resp, err = rpc.QueryFriendList(ctx, &socialize.QueryFriendListRequest{
+		PageSize: req.PageSize,
+		PageNum:  req.PageNum,
+	})
+	if err != nil {
+		pack.SendFailResponse(c, errno.ConvertErr(err))
+		return
+	}
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
+}
 
-	c.JSON(consts.StatusOK, resp)
+// QueryFansList .
+// @router /follower/list [GET]
+func QueryFansList(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.QueryFansListRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.SendFailResponse(c, errno.NewErrNo(errno.ParamMissingErrorCode, err.Error()))
+		return
+	}
+	resp := new(api.QueryFansListResponse)
+	resp, err = rpc.QueryFansList(ctx, &socialize.QueryFansListRequest{
+		UserId:   req.UserID,
+		PageSize: req.PageSize,
+		PageNum:  req.PageNum,
+	})
+	if err != nil {
+		pack.SendFailResponse(c, errno.ConvertErr(err))
+		return
+	}
+	resp.Base = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
 }

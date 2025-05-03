@@ -1,0 +1,112 @@
+version: "2"
+run:
+  concurrency: 16
+  issues-exit-code: 1
+  tests: true
+linters:
+  default: none
+  enable:
+    - asciicheck
+    - copyloopvar
+    - decorder
+    - errorlint
+    - forcetypeassert
+    - govet
+    - importas
+    - inamedparam
+    - makezero
+    - mirror
+    - misspell
+    - nakedret
+    - nestif
+    - nolintlint
+    - tagalign
+    - unconvert
+    - whitespace
+  settings:
+    errorlint:
+      errorf: false
+      errorf-multi: true
+      asserts: true
+      comparison: true
+      allowed-errors:
+        - err: io.EOF
+          fun: example.com/pkg.Read
+      allowed-errors-wildcard:
+        - err: github.com/west2-online/domtok/pkg/errno
+          fun: github.com/west2-online/domtok/pkg/errno
+    lll:
+      tab-width: 1
+    makezero:
+      always: false
+    misspell:
+      locale: US
+      ignored-numbers:
+        - "0666"
+        - "0755"
+        - "42"
+      ignored-files:
+        - magic1_.+\.go$
+      ignored-functions:
+        - ^math\.
+        - ^http\.StatusText$
+    nakedret:
+      max-func-lines: 31
+    nestif:
+      min-complexity: 12
+    nilnil:
+      checked-types:
+        - ptr
+        - func
+        - iface
+        - map
+        - chan
+        - uintptr
+        - unsafeptr
+    staticcheck:
+      checks:
+        - all
+        - -SA1019
+    tagalign:
+      align: true
+      sort: true
+      order:
+        - json
+        - yaml
+        - yml
+        - toml
+        - mapstructure
+        - binding
+        - validate
+      strict: true
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/west2-online)
+      custom-order: true
+      no-lex-order: true
+    gofmt:
+      simplify: true
+    goimports:
+      local-prefixes:
+        - github.com/west2-online
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

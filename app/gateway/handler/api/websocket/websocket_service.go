@@ -20,7 +20,6 @@ var upgrade = websocket.HertzUpgrader{}
 func Chat(ctx context.Context, c *app.RequestContext) {
 	var err error
 	err = upgrade.Upgrade(c, func(conn *websocket.Conn) {
-
 		uid := strconv.FormatInt(service.GetUserIDFromContext(c), 10)
 		s := service.NewWebSocketService(ctx, c, conn)
 		//登录

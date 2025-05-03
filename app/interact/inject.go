@@ -37,5 +37,4 @@ func InjectInteractHandler() interact.InteractService {
 	svc := service.NewInteractService(db, ca, rpcImpl)
 	serviceAdapter := usecase.NewInteractUseCase(db, svc, ca, rpcImpl)
 	return rpc.NewInteractServiceImpl(serviceAdapter)
-
 }

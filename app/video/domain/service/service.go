@@ -86,7 +86,6 @@ func (svc *VideoService) QueryPopularVideoList(ctx context.Context, req *model.V
 		endIndex = count
 	}
 	return data[startIndex:endIndex], count, nil
-
 }
 
 func (svc *VideoService) VideoStream(ctx context.Context, req *model.VideoReq) ([]*model.Video, int64, error) {

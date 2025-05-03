@@ -81,3 +81,12 @@ struct ChatMessageList{
     1: required list<ChatMessage>  items,
     2: required i64 total,
 }
+
+struct LikeCount{
+    1:required i64 video_id,
+    2:required i64 count,
+}
+struct LikeCountList{
+    1:required list<LikeCount> items,
+     2: required i64 total,
+}

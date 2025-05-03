@@ -82,13 +82,22 @@ struct UpdateVideoCommentCountRequest{
 struct UpdateVideoCommentCountResponse{
       1:model.BaseResp base,
 }
+//获取点赞数目
+struct QueryLikeCountRequest{
+
+}
+struct QueryLikeCountResponse{
+    1:model.BaseResp base,
+    2:optional model.LikeCountList data,
+}
 service VideoService{
     PublishResponse PublishVideo(1:PublishRequest req),
     QueryPublishListResponse QueryList(1:QueryPublishListRequest req),
     SearchVideoByKeywordResponse SearchVideo(1:SearchVideoByKeywordRequest req),
     GetPopularListResponse GetPopularVideo(1:GetPopularListRequest req),
     VideoStreamResponse GetVideoStream(1:VideoStreamRequest req),
-    QueryVideoByVIdResponse QueryVideoById(1:QueryVideoByVIdRequest req)
-    UpdateVideoCommentCountResponse UpdateCommentCount(1:UpdateVideoCommentCountRequest req)
-    UpdateVideoLikeCountResponse UpdateLikeCount(1:UpdateVideoLikeCountRequest req)
+    QueryVideoByVIdResponse QueryVideoById(1:QueryVideoByVIdRequest req),
+    UpdateVideoCommentCountResponse UpdateCommentCount(1:UpdateVideoCommentCountRequest req),
+    UpdateVideoLikeCountResponse UpdateLikeCount(1:UpdateVideoLikeCountRequest req),
+    QueryLikeCountResponse QueryLikeCount (1:QueryLikeCountRequest req)
 }

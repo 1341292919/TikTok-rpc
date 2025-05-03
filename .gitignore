@@ -34,4 +34,8 @@ _testmain.go
 /output
 *.local.yml
 dumped_hertz_remote_config.json
-		  
+/config/config.yaml
+/docs/note
+/docs/text.txt
+/docker/data
+/docker/etcd

@@ -20,7 +20,7 @@ func (u *useCase) Like(ctx context.Context, req *model.InteractReq) error {
 		return err
 	}
 	//创建喜欢关系-逻辑有点复杂
-	err = u.svc.CreateNewLike(ctx, req)
+	err = u.svc.NewLike(ctx, req)
 	if err != nil {
 		return err
 	}

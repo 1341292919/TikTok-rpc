@@ -257,6 +257,16 @@ func (db *videoDB) QueryVideoDuringTime(ctx context.Context, req *model.VideoReq
 	}
 	return buildVideoList(videoResp), count, nil
 }
+func (db *videoDB) QueryLikeCount(ctx context.Context) ([]*model.LikeCount, error) {
+	var videoResp []*Video
+	err := db.client.WithContext(ctx).
+		Table(constants.TableVideo).
+		Find(&videoResp).Error
+	if err != nil {
+		return nil, errno.Errorf(errno.InternalDatabaseErrorCode, "mysql: failed to get videoInfo: %v", err)
+	}
+	return buildLikeCountList(videoResp), nil
+}
 
 func updateVisitCount(tx *gorm.DB, videoid int64, delta int) error {
 	return tx.Table(constants.TableVideo).
@@ -286,4 +296,17 @@ func buildVideoList(data []*Video) []*model.Video {
 		videoList = append(videoList, buildVideo(video))
 	}
 	return videoList
+}
+func buildLikeCount(data *Video) *model.LikeCount {
+	return &model.LikeCount{
+		Count: data.LikeCount,
+		Id:    data.Id,
+	}
+}
+func buildLikeCountList(data []*Video) []*model.LikeCount {
+	list := make([]*model.LikeCount, 0)
+	for _, item := range data {
+		list = append(list, buildLikeCount(item))
+	}
+	return list
 }

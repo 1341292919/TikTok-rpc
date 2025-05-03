@@ -46,7 +46,7 @@ func LoginRPC(ctx context.Context, req *user.LoginRequest) (*api.LoginResponse, 
 	if !utils.IsRPCSuccess(resp.Base) { // 将其标注为服务错误，那么如果是数据库错误呢
 		return nil, errno.NewErrNo(resp.Base.Code, resp.Base.Msg)
 	}
-	//对数据进行封装
+	// 对数据进行封装
 	apiResp.Data = pack.User(resp.Data)
 	return apiResp, nil
 }

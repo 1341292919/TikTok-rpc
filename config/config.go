@@ -18,11 +18,12 @@ var (
 
 const (
 	File     = "./config/config.yaml"
+	FileTest = "/media/yang/OS/code/go/tiktok-rpc/config/config.yaml"
 	FileType = "yaml"
 )
 
 func Init(service string) {
-	runtimeViper.SetConfigFile(File)
+	runtimeViper.SetConfigFile(FileTest)
 	runtimeViper.SetConfigType(FileType)
 	if err := runtimeViper.ReadInConfig(); err != nil {
 		var configFileNotFoundError viper.ConfigFileNotFoundError

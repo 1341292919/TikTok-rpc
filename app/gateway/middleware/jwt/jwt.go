@@ -174,9 +174,7 @@ func IsAccessTokenAvailable(ctx context.Context, c *app.RequestContext) error {
 	}
 
 	return nil
-
 }
-
 func IsRefreshTokenAvailable(ctx context.Context, c *app.RequestContext) error {
 	claims, err := RefreshTokenJwtMiddleware.GetClaimsFromJWT(ctx, c)
 	if err != nil {

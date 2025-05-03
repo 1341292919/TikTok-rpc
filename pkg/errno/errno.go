@@ -53,7 +53,7 @@ func ConvertErr(err error) ErrNo {
 		return Success
 	}
 	errno := ErrNo{}
-	//如果err已经是该类型
+	// 如果err已经是该类型
 	if errors.As(err, &errno) {
 		return errno
 	}

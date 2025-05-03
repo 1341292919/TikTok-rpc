@@ -16,6 +16,6 @@ func InjectUserHandler() user.UserService {
 	}
 	db := mysql.NewUserDB(gormDB)
 	svc := service.NewUserService(db)
-	uc := usecase.NewUserCase(db, svc)
+	uc := usecase.NewUserUseCase(db, svc)
 	return rpc.NewUserServiceImpl(uc)
 }

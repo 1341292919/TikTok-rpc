@@ -87,9 +87,12 @@ func (db *interactDB) DeleteUserLike(ctx context.Context, targetid, uid, t int64
 	err := db.client.WithContext(ctx).
 		Table(constants.TableUserLike).
 		Where("user_id = ? and target_id = ? and type = ?", uid, targetid, t).
-		First(&u).
+		Find(&u).
 		Error
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "DeleteUserLike:"+err.Error())
 	}
 	u = &UserLike{
@@ -109,18 +112,26 @@ func (db *interactDB) DeleteUserLike(ctx context.Context, targetid, uid, t int64
 }
 
 func (db *interactDB) QueryAllUserLike(ctx context.Context) ([]*model.UserLike, error) {
-
 	var userLikes []*UserLike
 	err := db.client.WithContext(ctx).
 		Table(constants.TableUserLike).
 		Find(&userLikes).
 		Error
-
 	if err != nil {
-		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "DeleteUserLike:"+err.Error())
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "QueryAllUserLike:"+err.Error())
 	}
-
 	return buildUserLikeList(userLikes), nil
+}
+func (db *interactDB) QueryCommentLikeCount(ctx context.Context) ([]*model.LikeCount, error) {
+	var commentData []*Comment
+	err := db.client.WithContext(ctx).
+		Table(constants.TableComment).
+		Find(&commentData).
+		Error
+	if err != nil {
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "QueryAllUserLike:"+err.Error())
+	}
+	return buildLikeCountList(commentData), nil
 }
 
 func (db *interactDB) QueryUserLikeByUid(ctx context.Context, uid int64) ([]*model.UserLike, error) {
@@ -173,7 +184,7 @@ func (db *interactDB) DeleteComment(ctx context.Context, req *model.InteractReq)
 
 	err := db.client.WithContext(ctx).
 		Table(constants.TableComment).
-		Where("comment_id = ?", req.CommentId).
+		Where("id = ?", req.CommentId).
 		First(&commentData).
 		Error
 	if err != nil {
@@ -184,7 +195,7 @@ func (db *interactDB) DeleteComment(ctx context.Context, req *model.InteractReq)
 	}
 	err = db.client.WithContext(ctx).
 		Table(constants.TableComment).
-		Where("comment_id = ?", req.CommentId).
+		Where("id = ?", req.CommentId).
 		Delete(&commentData).
 		Error
 	if err != nil {
@@ -271,4 +282,19 @@ func buildCommentList(data []*Comment) []*model.Comment {
 		commenlist = append(commenlist, buildComment(item))
 	}
 	return commenlist
+}
+
+func buildLikeCount(data *Comment) *model.LikeCount {
+	return &model.LikeCount{
+		Count: data.LikeCount,
+		Id:    data.Id,
+		Type:  1,
+	}
+}
+func buildLikeCountList(data []*Comment) []*model.LikeCount {
+	list := make([]*model.LikeCount, 0)
+	for _, item := range data {
+		list = append(list, buildLikeCount(item))
+	}
+	return list
 }

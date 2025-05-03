@@ -27,7 +27,6 @@ func (svc *WebSocketService) UpdateDB(ctx context.Context) error {
 }
 
 func SyncDB() {
-
 	for {
 		time.Sleep(15 * time.Second)
 		err := svc.UpdateDB(context.Background())
@@ -37,5 +36,4 @@ func SyncDB() {
 		}
 		hlog.Info("UpdateDB Success!")
 	}
-
 }

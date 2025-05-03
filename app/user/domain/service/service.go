@@ -36,7 +36,6 @@ func (svc *UserService) MFACheck(ctx context.Context, user *model.User) (bool, e
 		return false, err
 	}
 	return svc.TotpValidate(user.Code, MFAMessage.Secret), nil
-
 }
 func (svc *UserService) UploadAvatar(ctx context.Context, user *model.User) (*model.User, error) {
 	return svc.db.UpdateUser(ctx, user)

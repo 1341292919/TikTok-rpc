@@ -8,37 +8,45 @@ import (
 )
 
 func (svc *InteractService) UpdateDB(ctx context.Context) error {
-	vcount, err := svc.cache.QueryVideoLikeData(ctx)
+	userLikes, vCount, cCount, err := svc.cache.GetUserLikeMessage(ctx)
+	hlog.Info(len(userLikes), len(vCount), len(cCount))
 	if err != nil {
 		return err
 	}
-	Ccount, err := svc.cache.QueryCommentLikeData(ctx)
-	if err != nil {
-		return err
-	}
-	userlikes, err := svc.cache.QueryAllUserLike(ctx)
-	for _, v := range vcount {
+	for _, v := range vCount {
 		err = svc.Rpc.UpdateVideoLikeCount(ctx, v.Id, v.Count)
 		if err != nil {
-			return err
+			logger.Infof(err.Error())
+			continue
 		}
 	}
-	for _, c := range Ccount {
+	for _, c := range cCount {
 		err = svc.db.UpdateCommentLikeCount(ctx, c.Id, c.Count)
 		if err != nil {
-			return err
+			logger.Infof(err.Error())
+			continue
 		}
 	}
-	for _, u := range userlikes {
-		if u.Status == 0 {
-			err = svc.db.CreateNewUserLike(ctx, u.VideoId, u.Uid, u.Type)
-			if err != nil {
-				return err
+	for _, u := range userLikes {
+		if u.Status == 1 {
+			if u.Type == 0 {
+				err = svc.db.CreateNewUserLike(ctx, u.VideoId, u.Uid, u.Type)
+			} else if u.Type == 1 {
+				err = svc.db.CreateNewUserLike(ctx, u.CommentId, u.Uid, u.Type)
 			}
-		} else if u.Status == 1 {
-			err = svc.db.DeleteUserLike(ctx, u.Uid, u.CommentId, u.Type)
 			if err != nil {
-				return err
+				logger.Infof(err.Error())
+				continue
+			}
+		} else if u.Status == 0 {
+			if u.Type == 0 {
+				err = svc.db.DeleteUserLike(ctx, u.VideoId, u.Uid, u.Type)
+			} else if u.Type == 1 {
+				err = svc.db.DeleteUserLike(ctx, u.CommentId, u.Uid, u.Type)
+			}
+			if err != nil {
+				logger.Infof(err.Error())
+				continue
 			}
 		}
 	}

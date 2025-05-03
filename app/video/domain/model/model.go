@@ -23,3 +23,7 @@ type VideoReq struct {
 	ToDate   int64
 	Username string
 }
+type LikeCount struct {
+	Id    int64
+	Count int64
+}

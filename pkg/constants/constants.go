@@ -2,9 +2,11 @@ package constants
 
 // redis
 const (
-	VideoIdKey = "VideoId"
-	VideoKey   = "Video"
-	MessageKey = "Message"
+	VideoIdKey     = "VideoId"
+	VideoKey       = "Video"
+	MessageKey     = "Message"
+	VideoLikeKey   = "VideoLike"
+	CommentLikeKey = "CommentLike"
 )
 
 // Service Name

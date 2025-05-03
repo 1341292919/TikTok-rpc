@@ -3,6 +3,7 @@ package rpc
 import (
 	rpcModel "TikTok-rpc/app/interact/domain/model"
 	"TikTok-rpc/app/interact/domain/repository"
+	"TikTok-rpc/kitex_gen/model"
 	"TikTok-rpc/kitex_gen/user"
 	"TikTok-rpc/kitex_gen/user/userservice"
 	"TikTok-rpc/kitex_gen/video"
@@ -28,6 +29,7 @@ func (rpc *InteractRpcImpl) IsVideoExist(ctx context.Context, videoID int64) (bo
 	checkReq := &video.QueryVideoByVIdRequest{
 		VideoId: videoID,
 	}
+
 	resp, err := rpc.video.QueryVideoById(ctx, checkReq)
 	if err != nil {
 		logger.Errorf("IsVideoExistRPC: RPC called failed: %v", err.Error())
@@ -92,6 +94,18 @@ func (rpc *InteractRpcImpl) UpdateVideoLikeCount(ctx context.Context, videoID, c
 	return nil
 }
 
+func (rpc *InteractRpcImpl) QueryVideoLikeCount(ctx context.Context) ([]*rpcModel.LikeCount, error) {
+	req := &video.QueryLikeCountRequest{}
+	resp, err := rpc.video.QueryLikeCount(ctx, req)
+	if err != nil {
+		logger.Errorf(" QueryVideoLikeCountRPC: RPC called failed: %v", err.Error())
+		return nil, errno.InternalServiceError.WithError(err)
+	}
+	if !utils.IsRPCSuccess(resp.Base) {
+		return nil, errno.NewErrNo(errno.InternalRPCErrorCode, "interact-video rpc failed:"+resp.Base.Msg)
+	}
+	return buildLikeCountList(resp.Data), nil
+}
 func (rpc *InteractRpcImpl) AddCount(ctx context.Context, videoID, t int64) error {
 	return nil
 }
@@ -125,4 +139,19 @@ func (rpc *InteractRpcImpl) QueryVideoList(ctx context.Context, videoID []int64)
 		videoData = append(videoData, v)
 	}
 	return videoData, nil
+}
+
+func buildLikeCount(count *model.LikeCount) *rpcModel.LikeCount {
+	return &rpcModel.LikeCount{
+		Id:    count.VideoId,
+		Count: count.Count,
+		Type:  0,
+	}
+}
+func buildLikeCountList(data *model.LikeCountList) []*rpcModel.LikeCount {
+	likes := make([]*rpcModel.LikeCount, 0)
+	for _, v := range data.Items {
+		likes = append(likes, buildLikeCount(v))
+	}
+	return likes
 }
