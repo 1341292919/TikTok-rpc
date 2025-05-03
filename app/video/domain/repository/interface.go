@@ -16,6 +16,7 @@ type VideoDB interface {
 	UpdateCommentCount(ctx context.Context, videoid, changecount int64) error
 	UpdateLikeCount(ctx context.Context, videoid, likecount int64) error
 	QueryVideoDuringTime(ctx context.Context, req *model.VideoReq) ([]*model.Video, int64, error)
+	QueryLikeCount(ctx context.Context) ([]*model.LikeCount, error)
 }
 type VideoCache interface {
 	NewIdToRank(ctx context.Context, vid int64) error

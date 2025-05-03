@@ -1,0 +1,9 @@
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true#文件末尾自动插入空行
+end_of_line = lf #使用 Linux 风格的换行符（\n）
+
+[*.yaml]
+indent_size = 2

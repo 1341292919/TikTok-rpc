@@ -50,3 +50,8 @@ func _followMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _queryfanslistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

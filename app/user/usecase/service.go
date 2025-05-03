@@ -96,7 +96,6 @@ func (uc *useCase) GetUserInfo(ctx context.Context, user *model.User) (*model.Us
 }
 
 func (uc *useCase) GetMFACode(ctx context.Context, user *model.User) (*model.MFA, error) {
-
 	userData, err := uc.svc.GetUserInfoById(ctx, user)
 	if err != nil {
 		return nil, fmt.Errorf("check user meassage failed: %w", err)

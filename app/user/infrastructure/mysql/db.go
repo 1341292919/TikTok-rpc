@@ -154,7 +154,6 @@ func (db *userDB) CheckMFA(ctx context.Context, user *model.User) (*model.MFAMes
 		Secret: userResp.OptSecret,
 		Status: userResp.MfaStatus,
 	}, nil
-
 }
 func (db *userDB) QueryUserIdByUsername(ctx context.Context, user *model.User) (*model.User, error) {
 	var userResp *User

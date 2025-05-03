@@ -111,6 +111,7 @@ func (ca *videoCache) GetVideoByRank(ctx context.Context, count int64) ([]*model
 	}
 	return videos, nil
 }
+
 func (ca *videoCache) DeleteVideoRank(ctx context.Context) error {
 	// 删除视频排行Key
 	_, err := ca.Video.Del(ctx, constants.VideoKey).Result()

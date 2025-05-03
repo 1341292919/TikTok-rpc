@@ -69,6 +69,13 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"QueryLikeCount": kitex.NewMethodInfo(
+		queryLikeCountHandler,
+		newVideoServiceQueryLikeCountArgs,
+		newVideoServiceQueryLikeCountResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 }
 
 var (
@@ -279,6 +286,24 @@ func newVideoServiceUpdateLikeCountResult() interface{} {
 	return video.NewVideoServiceUpdateLikeCountResult()
 }
 
+func queryLikeCountHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*video.VideoServiceQueryLikeCountArgs)
+	realResult := result.(*video.VideoServiceQueryLikeCountResult)
+	success, err := handler.(video.VideoService).QueryLikeCount(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newVideoServiceQueryLikeCountArgs() interface{} {
+	return video.NewVideoServiceQueryLikeCountArgs()
+}
+
+func newVideoServiceQueryLikeCountResult() interface{} {
+	return video.NewVideoServiceQueryLikeCountResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -364,6 +389,16 @@ func (p *kClient) UpdateLikeCount(ctx context.Context, req *video.UpdateVideoLik
 	_args.Req = req
 	var _result video.VideoServiceUpdateLikeCountResult
 	if err = p.c.Call(ctx, "UpdateLikeCount", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) QueryLikeCount(ctx context.Context, req *video.QueryLikeCountRequest) (r *video.QueryLikeCountResponse, err error) {
+	var _args video.VideoServiceQueryLikeCountArgs
+	_args.Req = req
+	var _result video.VideoServiceQueryLikeCountResult
+	if err = p.c.Call(ctx, "QueryLikeCount", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

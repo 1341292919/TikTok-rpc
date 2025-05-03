@@ -19,6 +19,7 @@ func (svc *InteractService) IsIdOk(ctx context.Context, videoId, commentId int64
 		}
 	} else {
 		exist, err := svc.Rpc.IsVideoExist(ctx, videoId)
+
 		if err != nil {
 			return fmt.Errorf("check video exist failed: %w", err)
 		}
@@ -29,8 +30,8 @@ func (svc *InteractService) IsIdOk(ctx context.Context, videoId, commentId int64
 	return nil
 }
 
-func (svc *InteractService) CreateNewLike(ctx context.Context, req *model.InteractReq) error {
-	data, err := svc.cache.QueryAllUserLike(ctx)
+func (svc *InteractService) NewLike(ctx context.Context, req *model.InteractReq) error {
+	data, _, _, err := svc.cache.GetUserLikeMessage(ctx)
 	//如果redis刚刚启动 向redis引入数据
 	if err != nil {
 		return err
@@ -40,54 +41,78 @@ func (svc *InteractService) CreateNewLike(ctx context.Context, req *model.Intera
 		if err != nil {
 			return err
 		}
-		for _, v := range data {
-			if v.Type == 0 {
-				err = svc.cache.NewVideoLike(ctx, v.VideoId, v.Uid)
-				if err != nil {
-					return err
-				}
-			} else if v.Type == 1 {
-				err = svc.cache.NewCommentLike(ctx, v.CommentId, v.Uid)
-				if err != nil {
-					return err
-				}
-			}
+		err = svc.cache.UploadUserLike(ctx, data)
+		cLikeCount, err := svc.db.QueryCommentLikeCount(ctx)
+		if err != nil {
+			return err
+		}
+		err = svc.cache.UploadLikeCount(ctx, cLikeCount)
+		if err != nil {
+			return err
+		}
+		vLikeCount, err := svc.Rpc.QueryVideoLikeCount(ctx)
+		if err != nil {
+			return err
+		}
+		err = svc.cache.UploadLikeCount(ctx, vLikeCount)
+		if err != nil {
+			return err
 		}
 	}
 	//有video_id
 	if req.VideoId != 0 {
-		return svc.CreateVideoLike(ctx, req)
+		return svc.LikeVideo(ctx, req)
 	} else {
-		return svc.CreateNewLike(ctx, req)
+		return svc.LikeComment(ctx, req)
 	}
 }
 
-func (svc *InteractService) CreateVideoLike(ctx context.Context, req *model.InteractReq) error {
+func (svc *InteractService) LikeVideo(ctx context.Context, req *model.InteractReq) error {
 	exist, err := svc.cache.IsVideoLikeExist(ctx, req.VideoId, req.Uid)
 	if err != nil {
 		return err
 	}
-	if exist {
-		return errno.NewErrNo(errno.ServiceRepeatOperation, "like exist")
-	}
-	err = svc.cache.NewVideoLike(ctx, req.VideoId, req.Uid)
-	if err != nil {
-		return err
+	if req.ActionType == 1 { //点赞操作 阻挡已经点赞
+		if exist {
+			return errno.NewErrNo(errno.ServiceRepeatOperation, "like exist")
+		}
+		err = svc.cache.NewVideoLike(ctx, req.VideoId, req.Uid)
+		if err != nil {
+			return err
+		}
+	} else if req.ActionType == 0 { //取消点赞操作，阻挡未曾点赞
+		if !exist {
+			return errno.NewErrNo(errno.ServiceRepeatOperation, "like not exist")
+		}
+		err = svc.cache.UnlikeVideo(ctx, req.VideoId, req.Uid)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
-func (svc *InteractService) CreateCommentLike(ctx context.Context, req *model.InteractReq) error {
+func (svc *InteractService) LikeComment(ctx context.Context, req *model.InteractReq) error {
 	exist, err := svc.cache.IsCommentLikeExist(ctx, req.CommentId, req.Uid)
 	if err != nil {
 		return err
 	}
-	if exist {
-		return errno.NewErrNo(errno.ServiceRepeatOperation, "like exist")
-	}
-	err = svc.cache.NewCommentLike(ctx, req.CommentId, req.Uid)
-	if err != nil {
-		return err
+	if req.ActionType == 1 { //点赞操作 阻挡已经点赞
+		if exist {
+			return errno.NewErrNo(errno.ServiceRepeatOperation, "like exist")
+		}
+		err = svc.cache.NewCommentLike(ctx, req.CommentId, req.Uid)
+		if err != nil {
+			return err
+		}
+	} else if req.ActionType == 0 { //取消点赞操作，阻挡未曾点赞
+		if !exist {
+			return errno.NewErrNo(errno.ServiceRepeatOperation, "like not exist")
+		}
+		err = svc.cache.UnlikeComment(ctx, req.CommentId, req.Uid)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -95,7 +120,7 @@ func (svc *InteractService) CreateCommentLike(ctx context.Context, req *model.In
 func (svc *InteractService) QueryLikeList(ctx context.Context, req *model.InteractReq) ([]*model.Video, error) {
 	var vids []int64
 	//点赞信息先从cache内访问
-	data, err := svc.cache.QueryUserLikeById(ctx, req.Uid)
+	data, err := svc.cache.QueryUserLikeByUid(ctx, req.Uid)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +158,6 @@ func (svc *InteractService) QueryLikeList(ctx context.Context, req *model.Intera
 		endIndex = count
 	}
 	return videoData[startIndex:endIndex], nil
-
 }
 
 func (svc *InteractService) Comment(ctx context.Context, req *model.InteractReq) (int64, error) {
@@ -179,12 +203,12 @@ func (svc *InteractService) DeleteComment(ctx context.Context, req *model.Intera
 		return err
 	}
 	if c.Type == 0 {
-		err = svc.Rpc.UpdateVideoCommentCount(ctx, req.VideoId, -1)
+		err = svc.Rpc.UpdateVideoCommentCount(ctx, c.ParentId, -1)
 		if err != nil {
 			return err
 		}
 	} else if c.Type == 1 {
-		err = svc.db.UpdateCommentCount(ctx, req.CommentId, -1)
+		err = svc.db.UpdateCommentCount(ctx, c.ParentId, -1)
 	}
 	return nil
 }

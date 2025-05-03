@@ -30,3 +30,19 @@ func BuildVideoList(data []*rpc.Video, count int64) *model.VideoList {
 		Total: count,
 	}
 }
+func BuildLikeCount(data *rpc.LikeCount) *model.LikeCount {
+	return &model.LikeCount{
+		Count:   data.Count,
+		VideoId: data.Id,
+	}
+}
+func BuildLikeCountList(data []*rpc.LikeCount) *model.LikeCountList {
+	likeCountList := make([]*model.LikeCount, 0)
+	for _, v := range data {
+		likeCountList = append(likeCountList, BuildLikeCount(v))
+	}
+	return &model.LikeCountList{
+		Items: likeCountList,
+		Total: int64(len(data)),
+	}
+}

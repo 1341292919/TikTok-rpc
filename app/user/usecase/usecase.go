@@ -23,7 +23,7 @@ type useCase struct {
 	svc *service.UserService //想通过svc构建service层 作为db的上一层，所有的参数检验应该在这一层实现
 }
 
-func NewUserCase(db repository.UserDB, svc *service.UserService) *useCase {
+func NewUserUseCase(db repository.UserDB, svc *service.UserService) *useCase {
 	return &useCase{
 		db:  db,
 		svc: svc,

@@ -37,25 +37,17 @@ type InteractReq struct {
 	Content    string
 	Type       int64 //0视频 1评论
 }
-type LikeKey struct {
-	Uid       int64
-	VideoId   int64
-	CommentId int64
-	Type      int64 //0 视频 1 评论
-	Status    int64 //0点赞 1 不点赞
-	Time      int64
-}
-type VideoLikeCountKey struct {
+
+type LikeCount struct {
 	Id    int64
 	Count int64
+	Type  int64 //0 视频 1评论
 }
 type UserLike struct {
 	Uid       int64
 	VideoId   int64
 	CommentId int64
+	Status    int64 //1点赞 0不点赞
 	Type      int64 //0 视频 1 评论
-}
-type CommentLikeCountKey struct {
-	Id    int64
-	Count int64
+	Time      int64
 }

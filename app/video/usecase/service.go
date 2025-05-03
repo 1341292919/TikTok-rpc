@@ -81,3 +81,6 @@ func (uc *useCase) UpdateCommentCount(ctx context.Context, videoid, ccount int64
 func (uc *useCase) UpdateLikeCount(ctx context.Context, videoid, lcount int64) (err error) {
 	return uc.db.UpdateLikeCount(ctx, videoid, lcount)
 }
+func (uc *useCase) QueryLikeCount(ctx context.Context) ([]*model.LikeCount, error) {
+	return uc.db.QueryLikeCount(ctx)
+}

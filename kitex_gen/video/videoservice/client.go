@@ -19,6 +19,7 @@ type Client interface {
 	QueryVideoById(ctx context.Context, req *video.QueryVideoByVIdRequest, callOptions ...callopt.Option) (r *video.QueryVideoByVIdResponse, err error)
 	UpdateCommentCount(ctx context.Context, req *video.UpdateVideoCommentCountRequest, callOptions ...callopt.Option) (r *video.UpdateVideoCommentCountResponse, err error)
 	UpdateLikeCount(ctx context.Context, req *video.UpdateVideoLikeCountRequest, callOptions ...callopt.Option) (r *video.UpdateVideoLikeCountResponse, err error)
+	QueryLikeCount(ctx context.Context, req *video.QueryLikeCountRequest, callOptions ...callopt.Option) (r *video.QueryLikeCountResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -88,4 +89,9 @@ func (p *kVideoServiceClient) UpdateCommentCount(ctx context.Context, req *video
 func (p *kVideoServiceClient) UpdateLikeCount(ctx context.Context, req *video.UpdateVideoLikeCountRequest, callOptions ...callopt.Option) (r *video.UpdateVideoLikeCountResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.UpdateLikeCount(ctx, req)
+}
+
+func (p *kVideoServiceClient) QueryLikeCount(ctx context.Context, req *video.QueryLikeCountRequest, callOptions ...callopt.Option) (r *video.QueryLikeCountResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.QueryLikeCount(ctx, req)
 }

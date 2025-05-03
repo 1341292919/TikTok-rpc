@@ -3,477 +3,333 @@ package cache
 import (
 	"TikTok-rpc/app/interact/domain/model"
 	"TikTok-rpc/app/interact/domain/repository"
+	"TikTok-rpc/pkg/constants"
 	"TikTok-rpc/pkg/errno"
 	"context"
 	"errors"
 	"fmt"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/redis/go-redis/v9"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
 )
 
-// 修改后的Lua脚本 - 支持点赞/取消点赞操作
-const (
-	videoLikeScript = `
-	local userKey = KEYS[1]
-	local countKey = KEYS[2]
-	local opLogKey = KEYS[3]
-	local itemID = ARGV[1]
-	local opType = ARGV[2]  -- 0:点赞 1:取消
-	local timestamp = ARGV[3]
-	
-	-- 记录操作流水
-	redis.call("XADD", opLogKey, "*", "uid", ARGV[4], "vid", itemID, "op", opType, "ts", timestamp)
-	
-	-- 更新当前状态
-	if opType == "0" then
-		redis.call("HSET", userKey, "video:"..itemID, timestamp)
-		return redis.call("INCR", countKey)
-	else
-		redis.call("HDEL", userKey, "video:"..itemID)
-		return redis.call("DECR", countKey)
-	end
-	`
-
-	commentLikeScript = `
-	local userKey = KEYS[1]
-	local countKey = KEYS[2]
-	local opLogKey = KEYS[3]
-	local itemID = ARGV[1]
-	local opType = ARGV[2]
-	local timestamp = ARGV[3]
-	
-	-- 记录操作流水
-	redis.call("XADD", opLogKey, "*", "uid", ARGV[4], "cid", itemID, "op", opType, "ts", timestamp)
-	
-	-- 更新当前状态
-	if opType == "0" then
-		redis.call("HSET", userKey, "comment:"..itemID, timestamp)
-		return redis.call("INCR", countKey)
-	else
-		redis.call("HDEL", userKey, "comment:"..itemID)
-		return redis.call("DECR", countKey)
-	end
-	`
-)
-
 type interactCache struct {
 	UserLike  *redis.Client
-	Likecount *redis.Client
+	LikeCount *redis.Client
 }
 
 func NewInteractCache(userlike, count *redis.Client) repository.InteractCache {
 	return &interactCache{
 		UserLike:  userlike,
-		Likecount: count,
+		LikeCount: count,
 	}
 }
 
-func (cache *interactCache) IsVideoLikeExist(ctx context.Context, videoid, userid int64) (bool, error) {
-	userKey := fmt.Sprintf("uvlk:%d", userid)
-	videoField := fmt.Sprintf("video:%d", videoid)
-	exists, err := cache.UserLike.HExists(ctx, userKey, videoField).Result()
-	if err != nil {
-		return false, errno.NewErrNo(errno.InternalRedisErrorCode, "Check Like exist failed:"+err.Error())
-	}
-	return exists, nil
-}
-
-func (cache *interactCache) IsCommentLikeExist(ctx context.Context, commentid, userid int64) (bool, error) {
-	userKey := fmt.Sprintf("uvlk:%d", userid)
-	videoField := fmt.Sprintf("comment:%d", commentid)
-	exists, err := cache.UserLike.HExists(ctx, userKey, videoField).Result()
-	if err != nil {
-		return false, errno.NewErrNo(errno.InternalRedisErrorCode, "Check Like exist failed:"+err.Error())
-	}
-	return exists, nil
-}
-
-func (cache *interactCache) NewVideoLike(ctx context.Context, videoid, userid int64) error {
-	hlog.Info(videoid, userid)
-	_, err := cache.UserLike.Eval(ctx, videoLikeScript, []string{
-		fmt.Sprintf("uvlk:%d", userid),
-		fmt.Sprintf("video:likes:%d", videoid),
-		fmt.Sprintf("video:ops:%d", videoid), // 操作日志流
-	},
-		videoid,
-		"0", // 点赞操作
-		time.Now().Unix(),
-		userid,
-	).Result()
-	if err != nil {
-		return errno.NewErrNo(errno.InternalRedisErrorCode, "NewVideoLike:"+err.Error())
-	}
-	return nil
-}
-
-func (cache *interactCache) UnlikeVideoLike(ctx context.Context, videoid, userid int64) error {
-	_, err := cache.UserLike.Eval(ctx, videoLikeScript, []string{
-		fmt.Sprintf("uvlk:%d", userid),
-		fmt.Sprintf("video:likes:%d", videoid),
-		fmt.Sprintf("video:ops:%d", videoid),
-	},
-		videoid,
-		"1", // 取消点赞
-		time.Now().Unix(),
-		userid,
-	).Result()
-	if err != nil {
-		return errno.NewErrNo(errno.InternalRedisErrorCode, "UnlikeVideoLike:"+err.Error())
-	}
-	return nil
-}
-
+// 函数返回时调用update函数失去了原子性 仍需优化
 func (cache *interactCache) NewCommentLike(ctx context.Context, commentid, userid int64) error {
-	_, err := cache.UserLike.Eval(ctx, commentLikeScript, []string{
-		fmt.Sprintf("uvlk:%d", userid),
-		fmt.Sprintf("comment:likes:%d", commentid),
-		fmt.Sprintf("comment:ops:%d", commentid),
-	},
-		commentid,
-		"0",
-		time.Now().Unix(),
-		userid,
-	).Result()
+	userKey := fmt.Sprintf("uvlk:%d", userid)
+	field := fmt.Sprintf("comment:%d", commentid)
+	value := fmt.Sprintf("%d|%d", time.Now().Unix(), 1)
+	_, err := cache.UserLike.Pipelined(ctx, func(pipe redis.Pipeliner) error {
+		pipe.HSet(ctx, userKey, field, value)
+		pipe.Expire(ctx, userKey, 8*time.Hour)
+		return nil
+	})
 	if err != nil {
 		return errno.NewErrNo(errno.InternalRedisErrorCode, "NewCommentLike:"+err.Error())
 	}
-	return nil
+	return cache.UpdateLikeCount(ctx, commentid, 1, 1)
 }
-
-func (cache *interactCache) UnlikeCommentLike(ctx context.Context, commentid, userid int64) error {
-	_, err := cache.UserLike.Eval(ctx, commentLikeScript, []string{
-		fmt.Sprintf("uvlk:%d", userid),
-		fmt.Sprintf("comment:likes:%d", commentid),
-		fmt.Sprintf("comment:ops:%d", commentid),
-	},
-		commentid,
-		"1",
-		time.Now().Unix(),
-		userid,
-	).Result()
+func (cache *interactCache) UnlikeComment(ctx context.Context, commentid, userid int64) error {
+	userKey := fmt.Sprintf("uvlk:%d", userid)
+	field := fmt.Sprintf("comment:%d", commentid)
+	value := fmt.Sprintf("%d|%d", time.Now().Unix(), 0)
+	_, err := cache.UserLike.Pipelined(ctx, func(pipe redis.Pipeliner) error {
+		pipe.HSet(ctx, userKey, field, value)
+		pipe.Expire(ctx, userKey, 8*time.Hour)
+		return nil
+	})
 	if err != nil {
-		return errno.NewErrNo(errno.InternalRedisErrorCode, "UnlikeCommentLike:"+err.Error())
+		return errno.NewErrNo(errno.InternalRedisErrorCode, "NewCommentLike:"+err.Error())
+	}
+	return cache.UpdateLikeCount(ctx, commentid, -1, 1)
+}
+func (cache *interactCache) NewVideoLike(ctx context.Context, videoid, userid int64) error {
+	userKey := fmt.Sprintf("uvlk:%d", userid)
+	field := fmt.Sprintf("video:%d", videoid)
+	value := fmt.Sprintf("%d|%d", time.Now().Unix(), 1)
+	_, err := cache.UserLike.Pipelined(ctx, func(pipe redis.Pipeliner) error {
+		pipe.HSet(ctx, userKey, field, value)
+		pipe.Expire(ctx, userKey, 8*time.Hour)
+		return nil
+	})
+	if err != nil {
+		return errno.NewErrNo(errno.InternalRedisErrorCode, "NewVideoLike:"+err.Error())
+	}
+	return cache.UpdateLikeCount(ctx, videoid, 1, 0)
+}
+func (cache *interactCache) UnlikeVideo(ctx context.Context, videoid, userid int64) error {
+	userKey := fmt.Sprintf("uvlk:%d", userid)
+	field := fmt.Sprintf("video:%d", videoid)
+	value := fmt.Sprintf("%d|%d", time.Now().Unix(), 0)
+	_, err := cache.UserLike.Pipelined(ctx, func(pipe redis.Pipeliner) error {
+		pipe.HSet(ctx, userKey, field, value)
+		pipe.Expire(ctx, userKey, 8*time.Hour)
+		return nil
+	})
+	if err != nil {
+		return errno.NewErrNo(errno.InternalRedisErrorCode, "NewVideoLike:"+err.Error())
+	}
+	return cache.UpdateLikeCount(ctx, videoid, -1, 0)
+}
+func (cache *interactCache) UpdateLikeCount(ctx context.Context, id, value, t int64) error {
+	score, err := cache.LikeCount.ZScore(ctx, constants.VideoKey, strconv.FormatInt(id, 10)).Result()
+	if err != nil && !errors.Is(err, redis.Nil) {
+		return errno.NewErrNo(errno.InternalRedisErrorCode, "UpdateLikeCountk :get score failed"+err.Error())
+	}
+	if errors.Is(err, redis.Nil) {
+		score = 0
+	}
+	v := redis.Z{
+		Score:  score + float64(value),
+		Member: id,
+	}
+	if t == 0 {
+		_, err = cache.LikeCount.ZAdd(ctx, constants.VideoLikeKey, v).Result()
+	} else if t == 1 {
+		_, err = cache.LikeCount.ZAdd(ctx, constants.CommentLikeKey, v).Result()
+	}
+	if err != nil {
+		return errno.NewErrNo(errno.InternalRedisErrorCode, "UpdateLikeCount : add failed"+err.Error())
 	}
 	return nil
 }
-
-func (cache *interactCache) QueryVideoLikeData(ctx context.Context) ([]*model.VideoLikeCountKey, error) {
-	counts := make([]*model.VideoLikeCountKey, 0)
-
-	// 使用SCAN迭代所有视频点赞计数键，避免阻塞Redis
-	iter := cache.UserLike.Scan(ctx, 0, "video:likes:*", 100).Iterator()
-	for iter.Next(ctx) {
-		key := iter.Val()
-		// 提取视频ID
-		vidStr := strings.TrimPrefix(key, "video:likes:")
-
-		videoId, err := strconv.ParseInt(vidStr, 10, 64)
-
-		if err != nil {
-			continue
+func (cache *interactCache) IsVideoLikeExist(ctx context.Context, videoid, userid int64) (bool, error) {
+	userKey := fmt.Sprintf("uvlk:%d", userid)
+	field := fmt.Sprintf("video:%d", videoid)
+	value, err := cache.UserLike.HGet(ctx, userKey, field).Result()
+	if err != nil {
+		// 键或字段不存在表示未点赞
+		if errors.Is(err, redis.Nil) {
+			return false, nil
 		}
-
-		// 获取点赞数
-		count, err := cache.UserLike.Get(ctx, key).Int64()
-		if err != nil && !errors.Is(err, redis.Nil) {
-			return nil, errno.NewErrNo(errno.InternalRedisErrorCode, "获取视频点赞数失败:"+err.Error())
+		return false, errno.NewErrNo(errno.InternalRedisErrorCode, "IsLikeExist: "+err.Error())
+	}
+	parts := strings.Split(value, "|")
+	if len(parts) != 2 {
+		return false, fmt.Errorf("invalid data format in redis")
+	}
+	// 检查状态值
+	status, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return false, fmt.Errorf("parse status failed: %v", err)
+	}
+	return status == 1, nil
+}
+func (cache *interactCache) IsCommentLikeExist(ctx context.Context, commentid, userid int64) (bool, error) {
+	userKey := fmt.Sprintf("uvlk:%d", userid)
+	field := fmt.Sprintf("comment:%d", commentid)
+	value, err := cache.UserLike.HGet(ctx, userKey, field).Result()
+	if err != nil {
+		// 键或字段不存在表示未点赞
+		if errors.Is(err, redis.Nil) {
+			return false, nil
 		}
-
-		counts = append(counts, &model.VideoLikeCountKey{
-			Id:    videoId,
-			Count: count,
-		})
+		return false, errno.NewErrNo(errno.InternalRedisErrorCode, "IsLikeExist: "+err.Error())
 	}
-
-	if err := iter.Err(); err != nil {
-		return nil, errno.NewErrNo(errno.InternalRedisErrorCode, "扫描视频点赞键失败:"+err.Error())
+	parts := strings.Split(value, "|")
+	if len(parts) != 2 {
+		return false, fmt.Errorf("invalid data format in redis")
 	}
-
-	return counts, nil
+	// 检查状态值
+	status, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return false, fmt.Errorf("parse status failed: %v", err)
+	}
+	return status == 1, nil
 }
 
-func (cache *interactCache) QueryCommentLikeData(ctx context.Context) ([]*model.CommentLikeCountKey, error) {
-	counts := make([]*model.CommentLikeCountKey, 0)
-
-	// 使用SCAN迭代所有评论点赞计数键
-	iter := cache.UserLike.Scan(ctx, 0, "comment:likes:*", 100).Iterator()
-	for iter.Next(ctx) {
-		key := iter.Val()
-		// 提取评论ID
-		cidStr := strings.TrimPrefix(key, "comment:likes:")
-		commentId, err := strconv.ParseInt(cidStr, 10, 64)
-		if err != nil {
-			continue
-		}
-
-		// 获取点赞数
-		count, err := cache.UserLike.Get(ctx, key).Int64()
-		if err != nil && !errors.Is(err, redis.Nil) {
-			return nil, errno.NewErrNo(errno.InternalRedisErrorCode, "获取评论点赞数失败:"+err.Error())
-		}
-
-		counts = append(counts, &model.CommentLikeCountKey{
-			Id:    commentId,
-			Count: count,
-		})
-	}
-
-	if err := iter.Err(); err != nil {
-		return nil, errno.NewErrNo(errno.InternalRedisErrorCode, "扫描评论点赞键失败:"+err.Error())
-	}
-
-	return counts, nil
-}
-
-func (cache *interactCache) QueryAllUserLike(ctx context.Context) ([]*model.LikeKey, error) {
-	var likeKeys []*model.LikeKey
-
-	// 1. 获取所有用户点赞键（使用SCAN避免阻塞）
-	iter := cache.UserLike.Scan(ctx, 0, "uvlk:*", 100).Iterator()
-	for iter.Next(ctx) {
-		userKey := iter.Val()
-		// 2. 提取用户ID
-		uid, err := strconv.ParseInt(strings.TrimPrefix(userKey, "uvlk:"), 10, 64)
-		if err != nil {
-			continue
-		}
-
-		// 3. 获取该用户的所有点赞记录
-		likeItems, err := cache.UserLike.HGetAll(ctx, userKey).Result()
-		if err != nil && !errors.Is(err, redis.Nil) {
-			return nil, errno.NewErrNo(errno.InternalRedisErrorCode, "获取用户点赞记录失败:"+err.Error())
-		}
-
-		// 4. 构建LikeKey结构
-		for field, timestampStr := range likeItems {
-			timestamp, _ := strconv.ParseInt(timestampStr, 10, 64)
-			likeKey := &model.LikeKey{
-				Uid:  uid,
-				Time: timestamp,
-				Type: 0, // 点赞状态
-			}
-
-			// 区分视频和评论点赞
-			if strings.HasPrefix(field, "video:") {
-				vid, _ := strconv.ParseInt(strings.TrimPrefix(field, "video:"), 10, 64)
-				likeKey.VideoId = vid
-				likeKey.Status = 0 // 视频类型
-			} else if strings.HasPrefix(field, "comment:") {
-				cid, _ := strconv.ParseInt(strings.TrimPrefix(field, "comment:"), 10, 64)
-				likeKey.CommentId = cid
-				likeKey.Status = 1 // 评论类型
-			}
-
-			likeKeys = append(likeKeys, likeKey)
-		}
-	}
-
-	if err := iter.Err(); err != nil {
-		return nil, errno.NewErrNo(errno.InternalRedisErrorCode, "扫描用户点赞键失败:"+err.Error())
-	}
-
-	// 5. 补充取消点赞的记录（从操作日志中获取）
-	// 获取所有操作日志流键
-	opsIter := cache.UserLike.Scan(ctx, 0, "*:ops:*", 100).Iterator()
-	for opsIter.Next(ctx) {
-		opKey := opsIter.Val()
-		// 解析流类型（video或comment）
-		var itemType int32
-		var itemId int64
-		if strings.Contains(opKey, "video:ops:") {
-			vidStr := strings.TrimPrefix(opKey, "video:ops:")
-			vid, err := strconv.ParseInt(vidStr, 10, 64)
-			if err != nil {
-				continue
-			}
-			itemType = 0 // 视频类型
-			itemId = vid
-		} else if strings.Contains(opKey, "comment:ops:") {
-			cidStr := strings.TrimPrefix(opKey, "comment:ops:")
-			cid, err := strconv.ParseInt(cidStr, 10, 64)
-			if err != nil {
-				continue
-			}
-			itemType = 1 // 评论类型
-			itemId = cid
-		} else {
-			continue
-		}
-
-		// 读取整个操作流
-		ops, err := cache.UserLike.XRange(ctx, opKey, "-", "+").Result()
-		if err != nil && !errors.Is(err, redis.Nil) {
-			continue // 跳过读取失败的操作流
-		}
-
-		// 处理每条操作记录
-		for _, op := range ops {
-			uidStr, ok := op.Values["uid"].(string)
-			if !ok {
-				continue
-			}
-			uid, err := strconv.ParseInt(uidStr, 10, 64)
-			if err != nil {
-				continue
-			}
-
-			opTypeStr, ok := op.Values["op"].(string)
-			if !ok {
-				continue
-			}
-			opType, err := strconv.ParseInt(opTypeStr, 10, 32)
-			if err != nil {
-				continue
-			}
-
-			timestampStr, ok := op.Values["ts"].(string)
-			if !ok {
-				continue
-			}
-			timestamp, err := strconv.ParseInt(timestampStr, 10, 64)
-			if err != nil {
-				continue
-			}
-
-			// 只处理取消点赞操作（opType=1）
-			if opType == 1 {
-				likeKey := &model.LikeKey{
-					Uid:  uid,
-					Time: timestamp,
-					Type: 1, // 取消点赞状态
-				}
-
-				if itemType == 0 {
-					likeKey.VideoId = itemId
-					likeKey.Status = 0 // 视频类型
-				} else {
-					likeKey.CommentId = itemId
-					likeKey.Status = 1 // 评论类型
-				}
-
-				likeKeys = append(likeKeys, likeKey)
-			}
-		}
-	}
-
-	if err := opsIter.Err(); err != nil {
-		return nil, errno.NewErrNo(errno.InternalRedisErrorCode, "扫描操作日志键失败:"+err.Error())
-	}
-
-	return likeKeys, nil
-}
-
-func (cache *interactCache) QueryUserLikeById(ctx context.Context, userid int64) ([]*model.LikeKey, error) {
-	var likeKeys []*model.LikeKey
+func (cache *interactCache) QueryUserLikeByUid(ctx context.Context, userid int64) ([]*model.UserLike, error) {
 	userKey := fmt.Sprintf("uvlk:%d", userid)
 
-	// 1. 获取该用户的所有点赞记录（当前状态）
-	likeItems, err := cache.UserLike.HGetAll(ctx, userKey).Result()
-	if err != nil && !errors.Is(err, redis.Nil) {
-		return nil, errno.NewErrNo(errno.InternalRedisErrorCode, "获取用户点赞记录失败:"+err.Error())
-	}
-
-	// 2. 构建当前点赞状态
-	for field, timestampStr := range likeItems {
-		timestamp, _ := strconv.ParseInt(timestampStr, 10, 64)
-		likeKey := &model.LikeKey{
-			Uid:  userid,
-			Time: timestamp,
-			Type: 0, // 点赞状态
+	fields, err := cache.UserLike.HGetAll(ctx, userKey).Result()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return nil, nil
 		}
-
-		// 区分视频和评论点赞
-		if strings.HasPrefix(field, "video:") {
-			vid, _ := strconv.ParseInt(strings.TrimPrefix(field, "video:"), 10, 64)
-			likeKey.VideoId = vid
-			likeKey.Status = 0 // 视频类型
-		} else if strings.HasPrefix(field, "comment:") {
-			cid, _ := strconv.ParseInt(strings.TrimPrefix(field, "comment:"), 10, 64)
-			likeKey.CommentId = cid
-			likeKey.Status = 1 // 评论类型
+		return nil, errno.NewErrNo(errno.InternalRedisErrorCode, fmt.Sprintf("QueryUserLikeByUid: failed to get user likes: %v", err))
+	}
+	results := make([]*model.UserLike, 0)
+	for field, value := range fields {
+		if !strings.HasPrefix(field, "video:") {
+			continue
 		}
-
-		likeKeys = append(likeKeys, likeKey)
-	}
-
-	// 3. 获取该用户的所有取消点赞记录（从操作日志中）
-	// 查找用户参与过的所有操作流
-	opsKeys, err := cache.UserLike.Keys(ctx, "*:ops:*").Result()
-	if err != nil && !errors.Is(err, redis.Nil) {
-		return nil, errno.NewErrNo(errno.InternalRedisErrorCode, "获取操作日志键失败:"+err.Error())
-	}
-
-	for _, opKey := range opsKeys {
-		// 解析流类型（video或comment）
-		var itemType int64
-		var itemId int64
-
-		if strings.Contains(opKey, "video:ops:") {
-			vidStr := strings.TrimPrefix(opKey, "video:ops:")
-			vid, err := strconv.ParseInt(vidStr, 10, 64)
-			if err != nil {
-				continue
-			}
-			itemType = 0 // 视频类型
-			itemId = vid
-		} else if strings.Contains(opKey, "comment:ops:") {
-			cidStr := strings.TrimPrefix(opKey, "comment:ops:")
-			cid, err := strconv.ParseInt(cidStr, 10, 64)
-			if err != nil {
-				continue
-			}
-			itemType = 1 // 评论类型
-			itemId = cid
-		} else {
+		videoIDStr := strings.TrimPrefix(field, "video:")
+		videoID, err := strconv.ParseInt(videoIDStr, 10, 64)
+		if err != nil {
 			continue
 		}
 
-		// 读取操作流中该用户的操作记录
-		ops, err := cache.Likecount.XRange(ctx, opKey, "-", "+").Result()
+		parts := strings.Split(value, "|")
+		if len(parts) != 2 {
+			continue
+		}
+
+		timestamp, err := strconv.ParseInt(parts[0], 10, 64)
+		if err != nil {
+			continue
+		}
+
+		status, err := strconv.Atoi(parts[1])
+		if err != nil {
+			continue
+		}
+
+		// 只返回点赞状态为1的记录
+		if status == 1 {
+			results = append(results, &model.UserLike{
+				Uid:     userid,
+				VideoId: videoID,
+				Status:  int64(status),
+				Time:    time.Unix(timestamp, 0).Unix(),
+				Type:    0,
+			})
+		}
+	}
+	return results, nil
+}
+
+// 该接口函数用于查询redis内的所有内容 用于同步mysql
+func (cache *interactCache) GetUserLikeMessage(ctx context.Context) ([]*model.UserLike, []*model.LikeCount, []*model.LikeCount, error) {
+	userLikes := make([]*model.UserLike, 0)
+	userIter := cache.UserLike.Scan(ctx, 0, "uvlk:*", 0).Iterator()
+	for userIter.Next(ctx) {
+		userKey := userIter.Val()
+		userID, err := strconv.ParseInt(strings.TrimPrefix(userKey, "uvlk:"), 10, 64)
+		if err != nil {
+			continue
+		}
+		fields, err := cache.UserLike.HGetAll(ctx, userKey).Result()
 		if err != nil && !errors.Is(err, redis.Nil) {
-			continue
+			return nil, nil, nil, fmt.Errorf("get user likes failed: %v", err)
 		}
-
-		for _, op := range ops {
-			// 只处理当前用户的操作
-			if uidStr, ok := op.Values["uid"].(string); ok {
-				if opUid, _ := strconv.ParseInt(uidStr, 10, 64); opUid == userid {
-					opTypeStr, _ := op.Values["op"].(string)
-					opType, _ := strconv.ParseInt(opTypeStr, 10, 64)
-					timestampStr, _ := op.Values["ts"].(string)
-					timestamp, _ := strconv.ParseInt(timestampStr, 10, 64)
-
-					// 只收集取消点赞操作
-					if opType == 1 {
-						likeKey := &model.LikeKey{
-							Uid:  userid,
-							Time: timestamp,
-							Type: 1, // 取消点赞状态
-						}
-
-						if itemType == 0 {
-							likeKey.VideoId = itemId
-							likeKey.Status = 0 // 视频类型
-						} else {
-							likeKey.CommentId = itemId
-							likeKey.Status = 1 // 评论类型
-						}
-
-						likeKeys = append(likeKeys, likeKey)
-					}
+		for field, value := range fields {
+			if strings.HasPrefix(field, "video:") {
+				videoID, err := strconv.ParseInt(strings.TrimPrefix(field, "video:"), 10, 64)
+				if err != nil {
+					continue
 				}
+				parts := strings.Split(value, "|")
+				if len(parts) != 2 {
+					continue
+				}
+				status, _ := strconv.Atoi(parts[1])
+				userLike := &model.UserLike{
+					Uid:     userID,
+					VideoId: videoID,
+					Status:  int64(status),
+					Type:    0, //代表是对视频的点赞
+				}
+				userLikes = append(userLikes, userLike)
+			} else if strings.HasPrefix(field, "comment:") {
+				commentID, err := strconv.ParseInt(strings.TrimPrefix(field, "comment:"), 10, 64)
+				if err != nil {
+					continue
+				}
+				parts := strings.Split(value, "|")
+				if len(parts) != 2 {
+					continue
+				}
+				status, _ := strconv.Atoi(parts[1])
+				userLike := &model.UserLike{
+					Uid:       userID,
+					CommentId: commentID,
+					Status:    int64(status),
+					Type:      1, //代表是对评论的点赞
+				}
+				userLikes = append(userLikes, userLike)
 			}
 		}
 	}
+	//接下来对LikeCount的信息进行统计
+	commentLikeCounts := make([]*model.LikeCount, 0)
+	videoLikeCounts := make([]*model.LikeCount, 0)
+	Vrank, err := cache.LikeCount.ZRevRangeWithScores(ctx, constants.VideoLikeKey, 0, 100).Result()
+	if err != nil && !errors.Is(err, redis.Nil) {
+		return nil, nil, nil, errno.NewErrNo(errno.InternalRedisErrorCode, "GetVideoIdByRank :"+err.Error())
+	}
+	for _, item := range Vrank {
+		id, ok := item.Member.(string)
+		if !ok {
+			continue
+		}
+		videoID, err := strconv.ParseInt(id, 10, 64)
+		if err != nil {
+			continue
+		}
+		videoLikeCounts = append(videoLikeCounts, &model.LikeCount{
+			Id:    videoID,
+			Count: int64(item.Score),
+			Type:  0,
+		})
+	}
+	Crank, err := cache.LikeCount.ZRevRangeWithScores(ctx, constants.CommentLikeKey, 0, 100).Result()
+	if err != nil && !errors.Is(err, redis.Nil) {
+		return nil, nil, nil, errno.NewErrNo(errno.InternalRedisErrorCode, "GetCommentLikeCount :"+err.Error())
+	}
+	for _, item := range Crank {
+		id, ok := item.Member.(string)
+		if !ok {
+			continue
+		}
+		commentID, err := strconv.ParseInt(id, 10, 64)
+		if err != nil {
+			continue
+		}
+		commentLikeCounts = append(commentLikeCounts, &model.LikeCount{
+			Id:    commentID,
+			Count: int64(item.Score),
+			Type:  1,
+		})
+	}
+	return userLikes, videoLikeCounts, commentLikeCounts, nil
+}
 
-	// 4. 按时间排序所有记录
-	sort.Slice(likeKeys, func(i, j int) bool {
-		return likeKeys[i].Time < likeKeys[j].Time
-	})
-
-	return likeKeys, nil
+// 由于redis内的内容会丢失，以下接口函数用于转载mysql内的内容
+func (cache *interactCache) UploadUserLike(ctx context.Context, data []*model.UserLike) error {
+	pipe := cache.UserLike.TxPipeline()
+	for _, item := range data {
+		userKey := fmt.Sprintf("uvlk:%d", item.Uid)
+		field := fmt.Sprintf("video:%d", item.VideoId)
+		value := fmt.Sprintf("%d|%d", item.Time, item.Status)
+		pipe.HSet(ctx, userKey, field, value)
+		pipe.Expire(ctx, userKey, 8*time.Hour)
+	}
+	_, err := pipe.Exec(ctx)
+	if err != nil {
+		return errno.NewErrNo(errno.InternalRedisErrorCode, fmt.Sprintf("UploadUserLike failed: %v", err))
+	}
+	return nil
+}
+func (cache *interactCache) UploadLikeCount(ctx context.Context, data []*model.LikeCount) error {
+	pipe := cache.LikeCount.TxPipeline()
+	for _, item := range data {
+		v := redis.Z{
+			Score:  float64(item.Count),
+			Member: item.Id,
+		}
+		if item.Type == 0 {
+			pipe.ZAdd(ctx, constants.VideoLikeKey, v)
+		} else if item.Type == 1 {
+			pipe.ZAdd(ctx, constants.CommentLikeKey, v)
+		}
+	}
+	pipe.Expire(ctx, constants.VideoLikeKey, 8*time.Hour)
+	pipe.Expire(ctx, constants.CommentLikeKey, 8*time.Hour)
+	_, err := pipe.Exec(ctx)
+	if err != nil {
+		return errno.NewErrNo(errno.InternalRedisErrorCode, fmt.Sprintf("UploadUserLike failed: %v", err))
+	}
+	return nil
 }
