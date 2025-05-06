@@ -1,15 +1,52 @@
-version: "3"
-
 services:
+  # Redis 服务，用于缓存、会话管理等，提供键值存储功能
+  redis:
+    container_name: redis
+    image: redis:bookworm
+    volumes:
+      - ./data/redis:/data
+    ports:
+      - "6379:6379"
+    env_file:
+      - "./env/redis.env"
+    networks:
+      - tiktok
+
+  # MySQL 服务，提供关系型数据库，用于存储结构化数据
+  mysql:
+    container_name: mysql
+    image: mysql:9.0.1
+    env_file:
+      - "./env/mysql.env"
+    ports:
+      - "3306:3306"
+    networks:
+      - tiktok
+    volumes:
+      - ../config/sql:/docker-entrypoint-initdb.d
+      - ./data/mysql:/var/lib/mysql
+
+  # etcd 服务，分布式键值存储系统，用于服务发现、配置管理
   etcd:
-    image: bitnami/etcd:3.5
     container_name: etcd
+    image: quay.io/coreos/etcd:v3.5.5
+    restart: always
     ports:
       - 2379:2379
       - 2380:2380
+    env_file:
+      - "./env/etcd.env"
     volumes:
-      - ./etcd/data:/bitnami/etcd-data
-    environment:
-      - TZ=Asia/Shanghai
-      - ALLOW_NONE_AUTHENTICATION=yes
-      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+      - ./script:/script
+      - ../config:/config
+      - ./data/etcd:/etcd-data
+    networks:
+      - tiktok
+    entrypoint: [ "sh", "-c", "chmod +x /script/etcd-monitor.sh && /script/etcd-monitor.sh & exec etcd" ]
+
+  
+
+networks:
+  tiktok:
+    driver: bridge
+    name: tiktok
