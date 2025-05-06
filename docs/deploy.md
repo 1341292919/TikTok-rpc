@@ -4,7 +4,7 @@
 10000、10001、10002、10003、10004、10005、10006
 或者你可以通过修改 `config/config.yaml` 文件来更改端口。
 #### 配置文件
-请通过参考docs/config.md 在程序部署前完善配置文件`config/config.yaml`
+请通过参考[config](docs/config.md) 在程序部署前完善配置文件`config/config.yaml`
 
 #### Docker 容器
 

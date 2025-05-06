@@ -36,6 +36,6 @@ _testmain.go
 dumped_hertz_remote_config.json
 /config/config.yaml
 /docs/note
-/docs/text.txt
+/docs/chat.md
 /docker/data
 /docker/etcd
