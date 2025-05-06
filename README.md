@@ -4,7 +4,7 @@
 [考核内容参考](https://github.com/west2-online/learn-go/blob/main/docs/5(2025)-微服务.md)
 
 ### 程序部署
-请参考[docker部署](docs/deploy)
+请参考[docker部署](docs/deploy.md)
 
 ## 飞书
 [文档](https://vcn9ra8gf7nh.feishu.cn/wiki/L8x3w7M2BioRRNkecYYcTnWJnRX)
