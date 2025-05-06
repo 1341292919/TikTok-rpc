@@ -6,12 +6,13 @@ import (
 	"TikTok-rpc/kitex_gen/user/userservice"
 	"TikTok-rpc/pkg/constants"
 	"TikTok-rpc/pkg/utils"
+	"log"
+	"net"
+
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
-	"github.com/kitex-contrib/registry-etcd"
-	"log"
-	"net"
+	etcd "github.com/kitex-contrib/registry-etcd"
 )
 
 var serviceName = constants.UserServiceName

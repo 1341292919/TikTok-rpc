@@ -6,15 +6,16 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/h2non/filetype"
-	"github.com/qiniu/go-sdk/v7/auth"
-	"github.com/qiniu/go-sdk/v7/storage"
 	"io"
 	"mime/multipart"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/h2non/filetype"
+	"github.com/qiniu/go-sdk/v7/auth"
+	"github.com/qiniu/go-sdk/v7/storage"
 )
 
 func IsImage(data *multipart.FileHeader) error {

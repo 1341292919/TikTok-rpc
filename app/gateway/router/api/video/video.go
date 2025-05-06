@@ -4,6 +4,7 @@ package video
 
 import (
 	video "TikTok-rpc/app/gateway/handler/api/video"
+
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

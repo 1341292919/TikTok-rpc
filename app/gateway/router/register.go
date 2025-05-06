@@ -8,6 +8,7 @@ import (
 	api_user "TikTok-rpc/app/gateway/router/api/user"
 	api_video "TikTok-rpc/app/gateway/router/api/video"
 	model "TikTok-rpc/app/gateway/router/model"
+
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

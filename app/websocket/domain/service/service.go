@@ -3,8 +3,9 @@ package service
 import (
 	"TikTok-rpc/app/websocket/domain/model"
 	"context"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"time"
+
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
 
 func (svc *WebSocketService) NewMessage(ctx context.Context, req *model.Message) error {

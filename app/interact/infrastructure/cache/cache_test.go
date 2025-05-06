@@ -6,8 +6,9 @@ import (
 	"TikTok-rpc/pkg/base/client"
 	"TikTok-rpc/pkg/constants"
 	"context"
-	. "github.com/smartystreets/goconvey/convey"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func initTest(t *testing.T) repository.InteractCache {

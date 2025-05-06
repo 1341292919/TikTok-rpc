@@ -3,6 +3,7 @@ package socializeservice
 
 import (
 	socialize "TikTok-rpc/kitex_gen/socialize"
+
 	server "github.com/cloudwego/kitex/server"
 )
 

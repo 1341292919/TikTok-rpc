@@ -8,9 +8,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/redis/go-redis/v9"
 	"strconv"
 	"time"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type videoCache struct {

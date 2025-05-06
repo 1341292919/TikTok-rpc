@@ -6,9 +6,10 @@ import (
 	"TikTok-rpc/pkg/utils"
 	"bytes"
 	"encoding/base64"
+	"image/png"
+
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
-	"image/png"
 )
 
 func (uc *UserService) OptSecret(username string, user *model.MFAMessage) (*model.MFA, error) {

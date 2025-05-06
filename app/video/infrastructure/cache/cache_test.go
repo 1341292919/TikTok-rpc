@@ -6,11 +6,12 @@ import (
 	"TikTok-rpc/pkg/base/client"
 	"TikTok-rpc/pkg/constants"
 	"context"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
-	. "github.com/smartystreets/goconvey/convey"
 	"sort"
 	"strconv"
 	"testing"
+
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func initTest(t *testing.T) repository.VideoCache {

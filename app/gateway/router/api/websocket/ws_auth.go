@@ -2,6 +2,7 @@ package websock
 
 import (
 	"TikTok-rpc/app/gateway/router/api/auth"
+
 	"github.com/cloudwego/hertz/pkg/app"
 )
 

@@ -5,9 +5,10 @@ import (
 	"TikTok-rpc/config"
 	"TikTok-rpc/pkg/base/client"
 	"context"
-	. "github.com/smartystreets/goconvey/convey"
 	"strconv"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 var _db repository.VideoDB

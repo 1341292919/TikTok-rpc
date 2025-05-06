@@ -6,10 +6,11 @@ import (
 	"TikTok-rpc/app/interact/infrastructure/cache"
 	"TikTok-rpc/app/interact/usecase/mocks"
 	"context"
+	"testing"
+
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"testing"
 )
 
 func TestUseCase_CommentVideo(t *testing.T) {

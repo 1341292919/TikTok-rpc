@@ -3,6 +3,7 @@ package pack
 import (
 	"TikTok-rpc/app/gateway/model/model"
 	"TikTok-rpc/pkg/errno"
+
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )

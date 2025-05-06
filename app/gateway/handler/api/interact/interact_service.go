@@ -11,6 +11,7 @@ import (
 
 	api "TikTok-rpc/app/gateway/model/api/interact"
 	"TikTok-rpc/kitex_gen/interact"
+
 	"github.com/cloudwego/hertz/pkg/app"
 )
 

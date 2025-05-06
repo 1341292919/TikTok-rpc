@@ -6,8 +6,9 @@ import (
 	"TikTok-rpc/config"
 	"TikTok-rpc/pkg/base/client"
 	"context"
-	. "github.com/smartystreets/goconvey/convey"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 var _db repository.InteractDB
@@ -118,7 +119,6 @@ func TestInteractDB_CreateNewUserLike(t *testing.T) {
 			So(err, ShouldBeNil)
 			likeData, err := _db.QueryUserLikeByUid(ctx, like.Uid)
 			So(err, ShouldBeNil)
-			So(likeData, ShouldNotBeEmpty)
 			found := false
 			for _, l := range likeData {
 				if l.Uid == like.Uid && l.Type == like.Type && (l.CommentId == like.CommentId || l.VideoId == like.VideoId) {

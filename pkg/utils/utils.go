@@ -3,9 +3,10 @@ package utils
 import (
 	"TikTok-rpc/config"
 	"errors"
-	"github.com/bytedance/gopkg/util/logger"
 	"net"
 	"strings"
+
+	"github.com/bytedance/gopkg/util/logger"
 )
 
 // GetMysqlDSN 会拼接 mysql 的 DSN

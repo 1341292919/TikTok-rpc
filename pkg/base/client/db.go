@@ -4,9 +4,10 @@ import (
 	"TikTok-rpc/pkg/errno"
 	"TikTok-rpc/pkg/utils"
 	"fmt"
+	"time"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"time"
 )
 
 func InitMySQL() (db *gorm.DB, err error) {

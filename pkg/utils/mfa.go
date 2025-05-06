@@ -3,8 +3,9 @@ package utils
 import (
 	"errors"
 	"fmt"
-	"github.com/pquerna/otp"
 	"net/url"
+
+	"github.com/pquerna/otp"
 )
 
 func ExtractSecretFromTOTPURL(totpURL string) (string, error) {
