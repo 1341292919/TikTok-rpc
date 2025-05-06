@@ -10,6 +10,7 @@ import (
 	"TikTok-rpc/kitex_gen/socialize"
 	"TikTok-rpc/pkg/errno"
 	"context"
+
 	"github.com/cloudwego/hertz/pkg/app"
 )
 

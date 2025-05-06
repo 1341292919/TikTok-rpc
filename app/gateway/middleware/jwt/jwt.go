@@ -10,11 +10,12 @@ import (
 	"TikTok-rpc/pkg/errno"
 	"context"
 	"encoding/json"
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/hertz-contrib/jwt"
 	"log"
 	"strconv"
 	"time"
+
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/hertz-contrib/jwt"
 )
 
 var (

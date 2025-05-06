@@ -4,6 +4,7 @@ package interact
 
 import (
 	interact "TikTok-rpc/app/gateway/handler/api/interact"
+
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

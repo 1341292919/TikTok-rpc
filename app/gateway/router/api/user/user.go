@@ -4,6 +4,7 @@ package user
 
 import (
 	user "TikTok-rpc/app/gateway/handler/api/user"
+
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

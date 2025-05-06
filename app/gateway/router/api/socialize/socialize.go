@@ -4,6 +4,7 @@ package socialize
 
 import (
 	socialize "TikTok-rpc/app/gateway/handler/api/socialize"
+
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

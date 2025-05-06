@@ -3,9 +3,10 @@ package service
 import (
 	"TikTok-rpc/app/websocket/domain/model"
 	"context"
+	"time"
+
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"time"
 )
 
 func (svc *WebSocketService) UpdateDB(ctx context.Context) error {

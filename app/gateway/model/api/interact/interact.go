@@ -6,6 +6,7 @@ import (
 	"TikTok-rpc/app/gateway/model/model"
 	"context"
 	"fmt"
+
 	"github.com/apache/thrift/lib/go/thrift"
 )
 

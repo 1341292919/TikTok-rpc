@@ -5,6 +5,7 @@ package interactservice
 import (
 	interact "TikTok-rpc/kitex_gen/interact"
 	"context"
+
 	client "github.com/cloudwego/kitex/client"
 	callopt "github.com/cloudwego/kitex/client/callopt"
 )

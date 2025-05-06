@@ -8,11 +8,12 @@ import (
 	web "TikTok-rpc/kitex_gen/websocket"
 	"TikTok-rpc/pkg/errno"
 	"context"
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/hertz-contrib/websocket"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/hertz-contrib/websocket"
 )
 
 type WebSocketService struct {

@@ -3,6 +3,7 @@ package interactservice
 
 import (
 	interact "TikTok-rpc/kitex_gen/interact"
+
 	server "github.com/cloudwego/kitex/server"
 )
 

@@ -2,9 +2,10 @@ package service
 
 import (
 	"context"
+	"time"
+
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"time"
 )
 
 func (svc *InteractService) UpdateDB(ctx context.Context) error {

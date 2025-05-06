@@ -6,9 +6,10 @@ import (
 	"TikTok-rpc/app/user/usecase"
 	"TikTok-rpc/app/user/usecase/mocks"
 	"context"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"testing"
 )
 
 func TestUseCase_RegisterUser(t *testing.T) {

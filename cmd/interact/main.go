@@ -7,12 +7,13 @@ import (
 	interactservice "TikTok-rpc/kitex_gen/interact/interactservice"
 	"TikTok-rpc/pkg/constants"
 	"TikTok-rpc/pkg/utils"
+	"log"
+	"net"
+
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
 	etcd "github.com/kitex-contrib/registry-etcd"
-	"log"
-	"net"
 )
 
 var serviceName = constants.InteractServiceName
