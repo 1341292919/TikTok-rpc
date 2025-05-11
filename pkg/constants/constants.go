@@ -34,9 +34,9 @@ const (
 )
 const (
 	ContextUserId   = "user_id"
-	AvatarStorePath = "/home/yang/Desktop/resource/avatar"
-	VideoStorePath  = "/home/yang/Desktop/resource/video"
-	CoverStorePath  = "/home/yang/Desktop/resource/cover"
+	AvatarStorePath = "resource/avatar"
+	VideoStorePath  = "resource/video"
+	CoverStorePath  = "resource/cover"
 	TableUser       = "user"
 	TableComment    = "comment"
 	TableMessage    = "chat_message"

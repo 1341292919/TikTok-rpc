@@ -19,12 +19,11 @@ var (
 
 const (
 	File     = "./config/config.yaml"
-	FileTest = "/media/yang/OS/code/go/tiktok-rpc/config/config.yaml"
 	FileType = "yaml"
 )
 
 func Init(service string) {
-	runtimeViper.SetConfigFile(FileTest)
+	runtimeViper.SetConfigFile(File)
 	runtimeViper.SetConfigType(FileType)
 	if err := runtimeViper.ReadInConfig(); err != nil {
 		var configFileNotFoundError viper.ConfigFileNotFoundError
@@ -54,6 +53,7 @@ func configMapping(srv string) {
 	Etcd = &c.Etcd
 	Service = getService(srv)
 }
+
 func getService(name string) *service {
 	addrList := runtimeViper.GetStringSlice("services." + name + ".addr")
 
