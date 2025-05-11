@@ -16,3 +16,20 @@
 | Oss.AccessKey  | -              | 七牛云存储的访问密钥  |
 | Oss.SecretKey  | -              | 七牛云存储的秘密密钥  |
 | Oss.Domain     | -              | 七牛云存储的域名    |
+
+
+
+请参照下文配置Oss部分
+Oss使用七牛云对象存储
+请根据下表配置 Oss.region：
+
+|  storage.Zone  | region |
+|---------------|--------|
+| Zone_z0 - 华东（浙江） | z0     |
+|Zone_z1 - 华北（北京） | z1     |
+| Zone_z2 - 华南（广东）    | z2     | 
+| Zone_na0 - 北美（洛杉矶）| na0    | 
+|Zone_as0 - 东南亚（新加坡））| as0    | 
+
+Oss.domain:
+请补充七牛云对应桶的CDN 加速域名或 源站域名

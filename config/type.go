@@ -26,6 +26,7 @@ type oss struct {
 	AccessKey string
 	SecretKey string
 	Domain    string
+	Region    string
 }
 type service struct {
 	Name     string

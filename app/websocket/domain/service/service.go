@@ -10,7 +10,6 @@ import (
 
 func (svc *WebSocketService) NewMessage(ctx context.Context, req *model.Message) error {
 	req.CreatedAT = time.Now().Unix()
-	req.Id = 1
 	err := svc.cache.NewMessage(ctx, req)
 	if err != nil {
 		return err

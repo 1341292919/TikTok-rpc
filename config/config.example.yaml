@@ -1,8 +1,8 @@
 mysql:
   addr: 127.0.0.1:3306
-  database: test
-  username: test
-  password: test
+  database: TikTok
+  username: TikTok
+  password: root
   charset: utf8mb4
 
 oss:
@@ -13,8 +13,8 @@ oss:
 
 redis:
   addr: 127.0.0.1:6379
-  username: ""
-  password: ""
+  username: "TikTok"
+  password: "TikTok"
 
 etcd:
   addr: 127.0.0.1:2379

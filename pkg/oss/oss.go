@@ -6,6 +6,10 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"io"
 	"mime/multipart"
 	"os"
@@ -119,8 +123,7 @@ func Upload(localFile, filename, userid, origin string) (string, error) {
 
 	cfg := storage.Config{}
 	// 空间对应的机房
-	cfg.Region = &storage.Zone_z2
-	// 是否使用https域名
+	cfg.Region = getQiniuZone(config.Oss.Region)
 	cfg.UseHTTPS = false
 	// 上传是否使用CDN上传加速
 	cfg.UseCdnDomains = false
@@ -168,4 +171,20 @@ func ExtractFirstFrame(videoPath, coverPath string) error {
 	}
 
 	return nil
+}
+func getQiniuZone(region string) *storage.Zone {
+	switch region {
+	case "z0":
+		return &storage.Zone_z0
+	case "z1":
+		return &storage.Zone_z1
+	case "z2":
+		return &storage.Zone_z2
+	case "na0":
+		return &storage.Zone_na0
+	case "as0":
+		return &storage.Zone_as0
+	default:
+		return &storage.Zone_z0 // 默认华东
+	}
 }
