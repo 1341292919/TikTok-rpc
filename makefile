@@ -14,6 +14,25 @@ ARCH := $(shell uname -m)
 DIR = $(shell pwd)
 IDL_PATH = $(DIR)/idl
 
+.PHONY: tidy
+tidy:
+	go mod tidy
+	go mod verify
+
+#启动相应服务
+.PHONY: $(addprefix run-,$(SERVICES))
+$(addprefix run-,$(SERVICES)): run-%:
+	@echo "Building $* service..."
+	@go build -o bin/$* cmd/$*/main.go && ./bin/$* &
+# 默认运行所有服务
+run-all: $(addprefix run-,$(SERVICES))
+
+#停止相应服务
+.PHONY: $(addprefix stop-,$(SERVICES))
+$(addprefix stop-,$(SERVICES)): stop-%:
+	 -pkill -f "bin/$*"
+stop-all :$(addprefix stop-,$(SERVICES))
+
 # 生成基于 Hertz 的脚手架
 .PHONY: hz-%
 hz-%:
@@ -76,12 +95,6 @@ lint:
 vulncheck:
 	govulncheck ./...
 
-.PHONY: tidy
-tidy:
-	go mod tidy
-
-
-
 .PHONY: build-%
 build-%:
 	@read -p "Confirm service name to push (type '$*' to confirm): " CONFIRM_SERVICE; \
@@ -101,3 +114,5 @@ build-%:
 		echo "Service '$*' is not a valid service. Available: [$(SERVICES)]"; \
 		exit 1; \
 	fi
+
+

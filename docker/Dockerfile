@@ -35,15 +35,17 @@ ENV TZ=Asia/Shanghai
 ENV SERVICE=${SERVICE}
 # ETCD_ADDR 默认值在 entrypoint 中设置，不在 Dockerfile 中提供
 
-# 换源，更新软件依赖
-RUN sed -i 's#https\?://dl-cdn.alpinelinux.org/alpine#https://mirrors.tuna.tsinghua.edu.cn/alpine#g' /etc/apk/repositories
-RUN apk update --no-cache && apk --no-cache add ca-certificates tzdata bash
+# 换源，更新软件依赖并安装 FFmpeg
+RUN sed -i 's#https\?://dl-cdn.alpinelinux.org/alpine#https://mirrors.tuna.tsinghua.edu.cn/alpine#g' /etc/apk/repositories && \
+    apk update --no-cache && \
+    apk --no-cache add ca-certificates tzdata bash ffmpeg
 
 # 创建工作目录
 WORKDIR /app
 
 # 复制 Binary 及启动脚本，调整权限设置
 COPY --from=builder /app/output /app/output
+COPY config/config.yaml /app/config/config.yaml
 COPY --from=builder /app/docker/script/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 

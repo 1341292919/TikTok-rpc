@@ -55,7 +55,7 @@ func UploadVideoGetUrl(data *multipart.FileHeader, userID int64) (string, string
 
 	// 6. 提取视频第一帧作为封面
 	if err = oss.ExtractFirstFrame(videoPath, coverPath); err != nil {
-		return "", "", errors.New("get cover failed")
+		return "", "", errors.New("get cover failed:" + err.Error())
 	}
 	// 7. 返回封面 URL 和视频 URL
 	videoUrl, err := oss.Upload(videoPath, videoFilename, strconv.FormatInt(userID, 10), "video")

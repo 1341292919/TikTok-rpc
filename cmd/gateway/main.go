@@ -4,6 +4,7 @@ package main
 
 import (
 	"TikTok-rpc/app/gateway/middleware/jwt"
+	"TikTok-rpc/app/gateway/router"
 	websock "TikTok-rpc/app/gateway/router/api/websocket"
 	"TikTok-rpc/app/gateway/rpc"
 	"TikTok-rpc/config"
@@ -31,7 +32,7 @@ func main() {
 		server.WithHostPorts(listenAddr),
 		server.WithHandleMethodNotAllowed(true),
 	)
-	register(h)
+	router.GeneratedRegister(h)
 	ws := server.Default(server.WithHostPorts("127.0.0.1:10000"))
 	ws.NoHijackConnPool = true
 	websock.WebsocketRegister(ws)
