@@ -6,10 +6,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"io"
 	"mime/multipart"
 	"os"
@@ -154,6 +150,14 @@ func Upload(localFile, filename, userid, origin string) (string, error) {
 
 // ExtractFirstFrame 从视频文件中提取第一帧作为封面图片
 func ExtractFirstFrame(videoPath, coverPath string) error {
+	// 获取封面文件的目录路径
+	dir := filepath.Dir(coverPath)
+
+	// 检查目录是否存在，不存在则创建（权限 0755：用户可读写执行，组和其他可读执行）
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("failed to create directory for cover: %v", err)
+	}
+
 	cmd := exec.Command(
 		"ffmpeg",
 		"-i", videoPath, // 输入视频文件
@@ -162,16 +166,15 @@ func ExtractFirstFrame(videoPath, coverPath string) error {
 		"-q:v", "2", // 图像质量（2表示高质量）
 		coverPath, // 输出封面路径
 	)
-
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 
 	if err := cmd.Run(); err != nil {
-		return errno.Errorf(errno.InterFileProcessErrorCode, "exec ffmpeg error")
+		return errno.Errorf(errno.InterFileProcessErrorCode, "exec ffmpeg error:%v,%v", err, stderr.String())
 	}
-
 	return nil
 }
+
 func getQiniuZone(region string) *storage.Zone {
 	switch region {
 	case "z0":
