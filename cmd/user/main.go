@@ -27,7 +27,6 @@ func main() {
 	if err != nil {
 		logger.Fatalf("User: new etcd registry failed, err: %v", err)
 	}
-
 	listenAddr, err := utils.GetAvailablePort()
 	if err != nil {
 		logger.Fatalf("User: get available port failed, err: %v", err)
@@ -46,7 +45,6 @@ func main() {
 		}),
 	)
 	err = svr.Run()
-
 	if err != nil {
 		log.Println(err.Error())
 	}

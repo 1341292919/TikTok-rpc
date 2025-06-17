@@ -29,94 +29,21 @@ func (svc *InteractService) IsIdOk(ctx context.Context, videoId, commentId int64
 	}
 	return nil
 }
-
 func (svc *InteractService) NewLike(ctx context.Context, req *model.InteractReq) error {
-	data, _, _, err := svc.cache.GetUserLikeMessage(ctx)
-	//如果redis刚刚启动 向redis引入数据
+	var userLike *model.UserLike
+	userLike = &model.UserLike{
+		Uid:       req.Uid,
+		Status:    req.ActionType,
+		Type:      req.Type,
+		VideoId:   req.VideoId,
+		CommentId: req.CommentId,
+	}
+	err := svc.Mq.SendLikeMessage(ctx, userLike)
 	if err != nil {
-		return err
-	}
-	if len(data) == 0 {
-		data, err := svc.db.QueryAllUserLike(ctx)
-		if err != nil {
-			return err
-		}
-		err = svc.cache.UploadUserLike(ctx, data)
-		cLikeCount, err := svc.db.QueryCommentLikeCount(ctx)
-		if err != nil {
-			return err
-		}
-		err = svc.cache.UploadLikeCount(ctx, cLikeCount)
-		if err != nil {
-			return err
-		}
-		vLikeCount, err := svc.Rpc.QueryVideoLikeCount(ctx)
-		if err != nil {
-			return err
-		}
-		err = svc.cache.UploadLikeCount(ctx, vLikeCount)
-		if err != nil {
-			return err
-		}
-	}
-	//有video_id
-	if req.VideoId != 0 {
-		return svc.LikeVideo(ctx, req)
-	} else {
-		return svc.LikeComment(ctx, req)
-	}
-}
-
-func (svc *InteractService) LikeVideo(ctx context.Context, req *model.InteractReq) error {
-	exist, err := svc.cache.IsVideoLikeExist(ctx, req.VideoId, req.Uid)
-	if err != nil {
-		return err
-	}
-	if req.ActionType == 1 { //点赞操作 阻挡已经点赞
-		if exist {
-			return errno.NewErrNo(errno.ServiceRepeatOperation, "like exist")
-		}
-		err = svc.cache.NewVideoLike(ctx, req.VideoId, req.Uid)
-		if err != nil {
-			return err
-		}
-	} else if req.ActionType == 0 { //取消点赞操作，阻挡未曾点赞
-		if !exist {
-			return errno.NewErrNo(errno.ServiceRepeatOperation, "like not exist")
-		}
-		err = svc.cache.UnlikeVideo(ctx, req.VideoId, req.Uid)
-		if err != nil {
-			return err
-		}
+		return errno.NewErrNo(errno.InternalServiceErrorCode, "SendNewLike :"+err.Error())
 	}
 	return nil
 }
-
-func (svc *InteractService) LikeComment(ctx context.Context, req *model.InteractReq) error {
-	exist, err := svc.cache.IsCommentLikeExist(ctx, req.CommentId, req.Uid)
-	if err != nil {
-		return err
-	}
-	if req.ActionType == 1 { //点赞操作 阻挡已经点赞
-		if exist {
-			return errno.NewErrNo(errno.ServiceRepeatOperation, "like exist")
-		}
-		err = svc.cache.NewCommentLike(ctx, req.CommentId, req.Uid)
-		if err != nil {
-			return err
-		}
-	} else if req.ActionType == 0 { //取消点赞操作，阻挡未曾点赞
-		if !exist {
-			return errno.NewErrNo(errno.ServiceRepeatOperation, "like not exist")
-		}
-		err = svc.cache.UnlikeComment(ctx, req.CommentId, req.Uid)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func (svc *InteractService) QueryLikeList(ctx context.Context, req *model.InteractReq) ([]*model.Video, error) {
 	var vids []int64
 	//点赞信息先从cache内访问
@@ -159,67 +86,68 @@ func (svc *InteractService) QueryLikeList(ctx context.Context, req *model.Intera
 	}
 	return videoData[startIndex:endIndex], nil
 }
-
-func (svc *InteractService) Comment(ctx context.Context, req *model.InteractReq) (int64, error) {
+func (svc *InteractService) Comment(ctx context.Context, req *model.InteractReq) error {
 	//有video_id
+	var c *model.CommentMessage
 	if req.VideoId != 0 {
-		return svc.CommentToVideo(ctx, req)
-	} else {
-		return svc.CommentToComment(ctx, req)
-	}
-}
-
-func (svc *InteractService) CommentToVideo(ctx context.Context, req *model.InteractReq) (int64, error) {
-	req.Type = 0
-	id, err := svc.db.CreateNewComment(ctx, req)
-	if err != nil {
-		return 0, err
-	}
-	//调用rpc的服务更新视频的评论数
-	err = svc.Rpc.UpdateVideoCommentCount(ctx, req.VideoId, 1)
-	if err != nil {
-		return 0, err
-	}
-	return id, nil
-}
-
-func (svc *InteractService) CommentToComment(ctx context.Context, req *model.InteractReq) (int64, error) {
-	req.Type = 1
-	id, err := svc.db.CreateNewComment(ctx, req)
-	if err != nil {
-		return 0, err
-	}
-	//更新评论的评论数
-	err = svc.db.UpdateCommentCount(ctx, req.CommentId, 1)
-	if err != nil {
-		return 0, err
-	}
-	return id, nil
-}
-
-func (svc *InteractService) DeleteComment(ctx context.Context, req *model.InteractReq) error {
-	c, err := svc.db.DeleteComment(ctx, req)
-	if err != nil {
-		return err
-	}
-	if c.Type == 0 {
-		err = svc.Rpc.UpdateVideoCommentCount(ctx, c.ParentId, -1)
-		if err != nil {
-			return err
+		req.Type = 0
+		c = &model.CommentMessage{
+			UId:      req.Uid,
+			Content:  req.Content,
+			Type:     req.Type,
+			TargetId: req.VideoId,
+			Delete:   0,
 		}
-	} else if c.Type == 1 {
-		err = svc.db.UpdateCommentCount(ctx, c.ParentId, -1)
+	} else {
+		req.Type = 1
+		c = &model.CommentMessage{
+			UId:      req.Uid,
+			Content:  req.Content,
+			Type:     req.Type,
+			TargetId: req.CommentId,
+			Delete:   0,
+		}
+	}
+	err := svc.Mq.SendCommentMessage(ctx, c)
+	if err != nil {
+		return errno.NewErrNo(errno.InternalServiceErrorCode, "SendCommentMessage :"+err.Error())
 	}
 	return nil
 }
-
+func (svc *InteractService) DeleteComment(ctx context.Context, req *model.InteractReq) error {
+	//有video_id
+	var c *model.CommentMessage
+	if req.VideoId != 0 {
+		req.Type = 0
+		c = &model.CommentMessage{
+			UId:      req.Uid,
+			Content:  req.Content,
+			Type:     req.Type,
+			TargetId: req.VideoId,
+			Delete:   1,
+		}
+	} else {
+		req.Type = 1
+		c = &model.CommentMessage{
+			UId:      req.Uid,
+			Content:  req.Content,
+			Type:     req.Type,
+			TargetId: req.CommentId,
+			Delete:   1,
+		}
+	}
+	err := svc.Mq.SendCommentMessage(ctx, c)
+	if err != nil {
+		return errno.NewErrNo(errno.InternalServiceErrorCode, "SendDeleteCommentMessage :"+err.Error())
+	}
+	return nil
+}
 func (svc *InteractService) QueryCommentList(ctx context.Context, req *model.InteractReq) ([]*model.Comment, int64, error) {
 	if req.VideoId != 0 {
 		req.Type = 0
 	} else {
 		req.Type = 1
 	}
-
 	data, err := svc.db.QueryCommentByParentId(ctx, req)
 	if err != nil {
 		return nil, 0, err

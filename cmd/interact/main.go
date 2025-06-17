@@ -2,7 +2,6 @@ package main
 
 import (
 	"TikTok-rpc/app/interact"
-	"TikTok-rpc/app/interact/domain/service"
 	"TikTok-rpc/config"
 	interactservice "TikTok-rpc/kitex_gen/interact/interactservice"
 	"TikTok-rpc/pkg/constants"
@@ -44,7 +43,6 @@ func main() {
 			ServiceName: serviceName, // 关键：设置服务名称
 		}),
 	)
-	go service.SyncDB()
 	err = svr.Run()
 	if err != nil {
 		log.Println(err.Error())

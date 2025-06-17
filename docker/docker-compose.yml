@@ -1,7 +1,7 @@
 services:
   # Redis 服务，用于缓存、会话管理等，提供键值存储功能
-  redis:
-    container_name: redis
+  tiktok-redis:
+    container_name: tiktok-redis
     image: redis:bookworm
     volumes:
       - ./data/redis:/data
@@ -13,8 +13,8 @@ services:
       - tiktok
 
   # MySQL 服务，提供关系型数据库，用于存储结构化数据
-  mysql:
-    container_name: mysql
+  tiktok-mysql:
+    container_name: tiktok-mysql
     image: mysql:9.0.1
     env_file:
       - "./env/mysql.env"
@@ -27,8 +27,8 @@ services:
       - ./data/mysql:/var/lib/mysql
 
   # etcd 服务，分布式键值存储系统，用于服务发现、配置管理
-  etcd:
-    container_name: etcd
+  tiktok-etcd:
+    container_name: tiktok-etcd
     image: quay.io/coreos/etcd:v3.5.5
     restart: always
     ports:
@@ -44,7 +44,72 @@ services:
       - tiktok
     entrypoint: [ "sh", "-c", "chmod +x /script/etcd-monitor.sh && /script/etcd-monitor.sh & exec etcd" ]
 
-  
+  # Kafka 服务，分布式流处理平台，用于构建实时数据管道和流应用
+  kafka:
+    container_name: tiktok-kafka
+    image: bitnami/kafka:latest
+    restart: always
+    user: root
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    env_file:
+      - ./env/kafka.env
+    volumes:
+      - ./data/kafka:/bitnami/kafka
+    networks:
+      - tiktok
+
+  # Kafka UI 服务，为 Kafka 提供可视化管理和监控界面
+  kafka-ui:
+    container_name: tiktok-kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    restart: always
+    ports:
+      - "9091:8080"
+    env_file:
+      - ./env/kafka-ui.env
+    networks:
+      - tiktok
+
+  # RocketMQ NameServer 服务，负责管理 Broker 的元数据
+  rmqnamesrv:
+    image: apache/rocketmq:4.9.6
+    container_name: tiktok-rmqnamesrv
+    ports:
+      - "9876:9876"
+    volumes:
+      - ./data/rocketmq/namesrv/logs:/opt/logs
+      - ./data/rocketmq/namesrv/store:/opt/store
+    command: sh mqnamesrv
+    networks:
+      tiktok:
+        aliases:
+          - rmqnamesrv
+    mem_limit: 250m
+
+  # RocketMQ Broker 服务，负责消息的存储、转发等核心功能
+  rmqbroker:
+    image: apache/rocketmq:4.9.6
+    container_name: tiktok-rmqbroker
+    ports:
+      - "10909:10909"
+      - "10911:10911"
+    volumes:
+      - ./data/rocketmq/broker/logs:/opt/logs
+      - ./data/rocketmq/broker/store:/opt/store
+      - ../config/rocketmq/broker.conf:/home/rocketmq/broker.conf
+      - ../config/rocketmq/plain_acl.yml:/home/rocketmq/rocketmq-4.9.6/conf/plain_acl.yml
+    env_file:
+      - ./env/rocket-broker.env
+    command: sh mqbroker -c /home/rocketmq/rocketmq-4.9.6/conf/broker.conf
+    depends_on:
+      - rmqnamesrv
+    networks:
+      tiktok:
+        aliases:
+          - rmqbroker
+    mem_limit: 750m
 
 networks:
   tiktok:

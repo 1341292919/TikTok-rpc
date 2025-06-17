@@ -13,6 +13,7 @@ var (
 	Mysql        *mySQL
 	Redis        *redis
 	Service      *service
+	Kafka        *kafka
 	Oss          *oss
 	runtimeViper = viper.New()
 )
@@ -49,6 +50,7 @@ func configMapping(srv string) {
 	}
 	Mysql = &c.MySQL
 	Redis = &c.Redis
+	Kafka = &c.Kafka
 	Oss = &c.OSS
 	Etcd = &c.Etcd
 	Service = getService(srv)

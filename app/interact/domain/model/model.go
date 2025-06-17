@@ -38,6 +38,13 @@ type InteractReq struct {
 	Type       int64 //0视频 1评论
 }
 
+type CommentMessage struct {
+	UId      int64
+	TargetId int64
+	Type     int64
+	Content  string
+	Delete   int64 //1表示该条消息用于删除对应评论
+}
 type LikeCount struct {
 	Id    int64
 	Count int64

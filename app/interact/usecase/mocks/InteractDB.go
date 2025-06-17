@@ -15,7 +15,7 @@ type InteractDB struct {
 }
 
 // CreateNewComment provides a mock function with given fields: ctx, req
-func (_m *InteractDB) CreateNewComment(ctx context.Context, req *model.InteractReq) (int64, error) {
+func (_m *InteractDB) CreateNewComment(ctx context.Context, req *model.CommentMessage) (int64, error) {
 	ret := _m.Called(ctx, req)
 
 	if len(ret) == 0 {
@@ -24,16 +24,16 @@ func (_m *InteractDB) CreateNewComment(ctx context.Context, req *model.InteractR
 
 	var r0 int64
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *model.InteractReq) (int64, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *model.CommentMessage) (int64, error)); ok {
 		return rf(ctx, req)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *model.InteractReq) int64); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *model.CommentMessage) int64); ok {
 		r0 = rf(ctx, req)
 	} else {
 		r0 = ret.Get(0).(int64)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *model.InteractReq) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *model.CommentMessage) error); ok {
 		r1 = rf(ctx, req)
 	} else {
 		r1 = ret.Error(1)
@@ -61,7 +61,7 @@ func (_m *InteractDB) CreateNewUserLike(ctx context.Context, targetid int64, uid
 }
 
 // DeleteComment provides a mock function with given fields: ctx, req
-func (_m *InteractDB) DeleteComment(ctx context.Context, req *model.InteractReq) (*model.Comment, error) {
+func (_m *InteractDB) DeleteComment(ctx context.Context, req *model.CommentMessage) (*model.Comment, error) {
 	ret := _m.Called(ctx, req)
 
 	if len(ret) == 0 {
@@ -70,10 +70,10 @@ func (_m *InteractDB) DeleteComment(ctx context.Context, req *model.InteractReq)
 
 	var r0 *model.Comment
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *model.InteractReq) (*model.Comment, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *model.CommentMessage) (*model.Comment, error)); ok {
 		return rf(ctx, req)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *model.InteractReq) *model.Comment); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *model.CommentMessage) *model.Comment); ok {
 		r0 = rf(ctx, req)
 	} else {
 		if ret.Get(0) != nil {
@@ -81,7 +81,7 @@ func (_m *InteractDB) DeleteComment(ctx context.Context, req *model.InteractReq)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *model.InteractReq) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *model.CommentMessage) error); ok {
 		r1 = rf(ctx, req)
 	} else {
 		r1 = ret.Error(1)

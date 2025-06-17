@@ -7,6 +7,7 @@ import (
 	"TikTok-rpc/pkg/errno"
 	"context"
 	"errors"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -73,6 +74,7 @@ func (db *interactDB) CreateNewUserLike(ctx context.Context, targetid, uid, t in
 		UserId:   uid,
 		Type:     t,
 		TargetId: targetid,
+		LikedAt:  time.Now(),
 	}
 	err = db.client.WithContext(ctx).
 		Table(constants.TableUserLike).
@@ -148,19 +150,19 @@ func (db *interactDB) QueryUserLikeByUid(ctx context.Context, uid int64) ([]*mod
 	return buildUserLikeList(userLikes), nil
 }
 
-func (db *interactDB) CreateNewComment(ctx context.Context, req *model.InteractReq) (int64, error) {
+func (db *interactDB) CreateNewComment(ctx context.Context, req *model.CommentMessage) (int64, error) {
 	var commentData *Comment
 	if req.Type == 0 {
 		commentData = &Comment{
-			UserId:   req.Uid,
-			ParentId: req.VideoId,
+			UserId:   req.UId,
+			ParentId: req.TargetId,
 			Content:  req.Content,
 			Type:     req.Type,
 		}
 	} else if req.Type == 1 {
 		commentData = &Comment{
-			UserId:   req.Uid,
-			ParentId: req.CommentId,
+			UserId:   req.UId,
+			ParentId: req.TargetId,
 			Content:  req.Content,
 			Type:     req.Type,
 		}
@@ -175,28 +177,28 @@ func (db *interactDB) CreateNewComment(ctx context.Context, req *model.InteractR
 	return commentData.Id, nil
 }
 
-func (db *interactDB) DeleteComment(ctx context.Context, req *model.InteractReq) (*model.Comment, error) {
+func (db *interactDB) DeleteComment(ctx context.Context, req *model.CommentMessage) (*model.Comment, error) {
 	var commentData *Comment
 
 	commentData = &Comment{
-		ParentId: req.CommentId,
+		ParentId: req.TargetId,
 		Type:     req.Type,
 	}
 
 	err := db.client.WithContext(ctx).
 		Table(constants.TableComment).
-		Where("id = ?", req.CommentId).
+		Where("id = ?", req.TargetId).
 		First(&commentData).
 		Error
 	if err != nil {
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "DeleteComment:"+err.Error())
 	}
-	if commentData.UserId != req.Uid {
+	if commentData.UserId != req.UId {
 		return nil, errno.NewErrNo(errno.ServiceNoAuthority, "Can not delete other user`s comment")
 	}
 	err = db.client.WithContext(ctx).
 		Table(constants.TableComment).
-		Where("id = ?", req.CommentId).
+		Where("id = ?", req.TargetId).
 		Delete(&commentData).
 		Error
 	if err != nil {
