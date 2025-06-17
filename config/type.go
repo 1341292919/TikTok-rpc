@@ -4,6 +4,7 @@ type config struct {
 	Etcd  etcd
 	MySQL mySQL
 	OSS   oss
+	Kafka kafka
 	Redis redis
 }
 type etcd struct {
@@ -16,6 +17,13 @@ type mySQL struct {
 	Password string
 	Charset  string
 }
+type kafka struct {
+	Address  string
+	Network  string
+	User     string
+	Password string
+}
+
 type redis struct {
 	Addr     string
 	Username string

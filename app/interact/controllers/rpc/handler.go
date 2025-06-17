@@ -88,12 +88,11 @@ func (s *InteractServiceImpl) Comment(ctx context.Context, req *interact.Comment
 			Uid:       req.UserId,
 		}
 	}
-	id, e := s.useCase.Comment(ctx, interactReq)
+	e := s.useCase.Comment(ctx, interactReq)
 	if e != nil {
 		resp.Base = pack.BuildBaseResp(errno.ConvertErr(e))
 		return
 	}
-	resp.CommentId = &id
 	resp.Base = pack.BuildBaseResp(errno.Success)
 	return
 }

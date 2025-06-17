@@ -3,10 +3,8 @@ package service
 import (
 	"TikTok-rpc/app/websocket/domain/model"
 	"context"
-	"time"
-
 	"github.com/bytedance/gopkg/util/logger"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"time"
 )
 
 func (svc *WebSocketService) UpdateDB(ctx context.Context) error {
@@ -27,14 +25,14 @@ func (svc *WebSocketService) UpdateDB(ctx context.Context) error {
 	return nil
 }
 
-func SyncDB() {
+func (svc *WebSocketService) SyncDB() {
+	defer svc.UpdateDB(context.Background())
 	for {
-		time.Sleep(15 * time.Second)
 		err := svc.UpdateDB(context.Background())
 		if err != nil {
 			logger.Infof("failed to update db: %v", err)
 			continue
 		}
-		hlog.Info("UpdateDB Success!")
+		time.Sleep(15 * time.Second)
 	}
 }

@@ -11,6 +11,12 @@ oss:
   secretKey:  ""
   domain: ""
 
+kafka:
+  address: 127.0.0.1:9092
+  network: tcp
+  user: tiktok
+  password: tiktok-password
+
 redis:
   addr: 127.0.0.1:6379
   username: "TikTok"

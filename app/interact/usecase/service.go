@@ -44,13 +44,13 @@ func (u *useCase) QueryLikeList(ctx context.Context, req *model.InteractReq) ([]
 	return data, count, nil
 }
 
-func (u *useCase) Comment(ctx context.Context, req *model.InteractReq) (int64, error) {
+func (u *useCase) Comment(ctx context.Context, req *model.InteractReq) error {
 	err := u.svc.IsIdOk(ctx, req.VideoId, req.CommentId)
 	if err != nil {
-		return -1, err
+		return err
 	}
-	id, err := u.svc.Comment(ctx, req)
-	return id, err
+	err = u.svc.Comment(ctx, req)
+	return err
 }
 
 func (u *useCase) DeleteComment(ctx context.Context, req *model.InteractReq) error {

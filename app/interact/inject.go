@@ -4,12 +4,14 @@ import (
 	"TikTok-rpc/app/interact/controllers/rpc"
 	"TikTok-rpc/app/interact/domain/service"
 	"TikTok-rpc/app/interact/infrastructure/cache"
+	"TikTok-rpc/app/interact/infrastructure/mq"
 	"TikTok-rpc/app/interact/infrastructure/mysql"
 	rpccli "TikTok-rpc/app/interact/infrastructure/rpc"
 	"TikTok-rpc/app/interact/usecase"
 	"TikTok-rpc/kitex_gen/interact"
 	"TikTok-rpc/pkg/base/client"
 	"TikTok-rpc/pkg/constants"
+	"TikTok-rpc/pkg/kafka"
 
 	"github.com/bytedance/gopkg/util/logger"
 )
@@ -23,6 +25,7 @@ func InjectInteractHandler() interact.InteractService {
 	if err != nil {
 		panic(err)
 	}
+	kafkaAdapter := mq.NewKafkaAdapter(kafka.NewKafkaInstance())
 	Lcount, err := client.NewRedisClient(constants.RedisDBInteract)
 	db := mysql.NewInteractDB(gormDB)
 	ca := cache.NewInteractCache(Ulike, Lcount)
@@ -35,7 +38,7 @@ func InjectInteractHandler() interact.InteractService {
 		logger.Errorf("Failed to init user rpc client: %v", err)
 	}
 	rpcImpl := rpccli.NewInteractRpcImpl(*vClient, *uClient)
-	svc := service.NewInteractService(db, ca, rpcImpl)
-	serviceAdapter := usecase.NewInteractUseCase(db, svc, ca, rpcImpl)
+	svc := service.NewInteractService(db, ca, rpcImpl, kafkaAdapter)
+	serviceAdapter := usecase.NewInteractUseCase(db, svc, ca, rpcImpl, kafkaAdapter)
 	return rpc.NewInteractServiceImpl(serviceAdapter)
 }

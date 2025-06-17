@@ -85,9 +85,18 @@ func (cache *interactCache) UnlikeVideo(ctx context.Context, videoid, userid int
 	return cache.UpdateLikeCount(ctx, videoid, -1, 0)
 }
 func (cache *interactCache) UpdateLikeCount(ctx context.Context, id, value, t int64) error {
-	score, err := cache.LikeCount.ZScore(ctx, constants.VideoKey, strconv.FormatInt(id, 10)).Result()
-	if err != nil && !errors.Is(err, redis.Nil) {
-		return errno.NewErrNo(errno.InternalRedisErrorCode, "UpdateLikeCountk :get score failed"+err.Error())
+	var score float64
+	var err error
+	if t == 0 {
+		score, err = cache.LikeCount.ZScore(ctx, constants.VideoLikeKey, strconv.FormatInt(id, 10)).Result()
+		if err != nil && !errors.Is(err, redis.Nil) {
+			return errno.NewErrNo(errno.InternalRedisErrorCode, "UpdateLikeCountk :get score failed"+err.Error())
+		}
+	} else {
+		score, err = cache.LikeCount.ZScore(ctx, constants.CommentLikeKey, strconv.FormatInt(id, 10)).Result()
+		if err != nil && !errors.Is(err, redis.Nil) {
+			return errno.NewErrNo(errno.InternalRedisErrorCode, "UpdateLikeCountk :get score failed"+err.Error())
+		}
 	}
 	if errors.Is(err, redis.Nil) {
 		score = 0

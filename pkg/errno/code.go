@@ -34,6 +34,7 @@ const (
 	InterFileProcessErrorCode                //文件处理错误
 	InternalDatabaseErrorCode
 	InternalRedisErrorCode // Redis错误
-	InternalRPCErrorCode   //
+	InternalKafkaErrorCode
+	InternalRPCErrorCode //
 	InternalWebSocketError
 )

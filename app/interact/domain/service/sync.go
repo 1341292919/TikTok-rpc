@@ -2,19 +2,18 @@ package service
 
 import (
 	"context"
-	"time"
-
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"time"
 )
 
 func (svc *InteractService) UpdateDB(ctx context.Context) error {
 	userLikes, vCount, cCount, err := svc.cache.GetUserLikeMessage(ctx)
-	hlog.Info(len(userLikes), len(vCount), len(cCount))
 	if err != nil {
 		return err
 	}
 	for _, v := range vCount {
+		hlog.Info(v.Count)
 		err = svc.Rpc.UpdateVideoLikeCount(ctx, v.Id, v.Count)
 		if err != nil {
 			logger.Infof(err.Error())
@@ -53,14 +52,14 @@ func (svc *InteractService) UpdateDB(ctx context.Context) error {
 	}
 	return nil
 }
-func SyncDB() {
+func (svc *InteractService) SyncDB() {
+	defer svc.UpdateDB(context.Background())
 	for {
-		time.Sleep(30 * time.Second)
 		err := svc.UpdateDB(context.Background())
 		if err != nil {
 			logger.Infof("failed to update db: %v", err)
 			continue
 		}
-		hlog.Info("UpdateDB Success!")
+		time.Sleep(30 * time.Minute)
 	}
 }
