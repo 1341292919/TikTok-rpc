@@ -6,6 +6,7 @@ type config struct {
 	OSS   oss
 	Kafka kafka
 	Redis redis
+	Otel  otel
 }
 type etcd struct {
 	Addr string
@@ -36,6 +37,11 @@ type oss struct {
 	Domain    string
 	Region    string
 }
+
+type otel struct {
+	CollectorAddr string `mapstructure:"collector-addr"`
+}
+
 type service struct {
 	Name     string
 	AddrList []string

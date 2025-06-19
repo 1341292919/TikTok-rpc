@@ -9,9 +9,10 @@ import (
 	"TikTok-rpc/kitex_gen/websocket/websocketservice"
 	"errors"
 	"fmt"
-
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
+
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	etcd "github.com/kitex-contrib/registry-etcd"
 )
 
@@ -28,6 +29,7 @@ func initRpcClient[T any](serviceName string, newClientFunc func(string, ...clie
 	client, err := newClientFunc(serviceName, client.WithResolver(r),
 		client.WithMuxConnection(1),
 		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: fmt.Sprintf("%s-client", serviceName)}),
+		client.WithSuite(tracing.NewClientSuite()),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("init RPC client failed: %w", err)

@@ -111,6 +111,38 @@ services:
           - rmqbroker
     mem_limit: 750m
 
+  # OpenTelemetry 收集器，收集、处理和导出可观测性数据（指标、追踪等）
+  tiktok-otel-collector:
+    image: otel/opentelemetry-collector-contrib-dev:latest
+    container_name: tiktok-otel-collector
+    command: [ "--config=/etc/otel-collector-config.yaml", "${OTELCOL_ARGS}" ]
+    volumes:
+      - ../config/otel-collector/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "1888:1888"   # pprof extension
+      - "8888"   # Prometheus metrics exposed by the collector
+      - "8889:8889"   # Prometheus exporter metrics
+      - "13133:13133" # health_check extension
+      - "4317:4317"   # OTLP gRPC receiver
+      - "55679" # zpages extension
+    depends_on:
+      - tiktok-jaeger
+    networks:
+      - tiktok
+
+  # Jaeger 服务，分布式追踪系统，用于监控和排查微服务性能问题
+  tiktok-jaeger:
+    container_name: tiktok-jaeger
+    image: jaegertracing/all-in-one:latest
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "16686:16686"
+      - "6831:6831"
+      - "4317"
+    networks:
+      - tiktok
+
 networks:
   tiktok:
     driver: bridge

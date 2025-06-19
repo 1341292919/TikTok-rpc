@@ -1,3 +1,4 @@
+
 CREATE TABLE tiktok.`comment`
 (
     `id` bigint NOT NULL AUTO_INCREMENT,
