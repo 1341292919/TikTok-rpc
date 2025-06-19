@@ -2,11 +2,13 @@ package main
 
 import (
 	"TikTok-rpc/app/websocket"
-	"TikTok-rpc/app/websocket/domain/service"
 	"TikTok-rpc/config"
 	"TikTok-rpc/kitex_gen/websocket/websocketservice"
+	"TikTok-rpc/pkg/base"
 	"TikTok-rpc/pkg/constants"
 	"TikTok-rpc/pkg/utils"
+	"context"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"log"
 	"net"
 
@@ -34,16 +36,23 @@ func main() {
 	if err != nil {
 		logger.Fatalf("Websocketr: resolve tcp addr failed, err: %v", err)
 	}
+
+	p := base.TelemetryProvider(serviceName, config.Otel.CollectorAddr)
+	defer func() {
+		err := p.Shutdown(context.Background())
+		logger.Fatalf("shutdown telemetry provider failed, err: %v", err)
+	}()
+
 	svr := websocketservice.NewServer(
 		//只能注入一个handler
 		websocket.InjectWebsocketHandler(),
+		server.WithSuite(tracing.NewServerSuite()),
 		server.WithServiceAddr(addr),
 		server.WithRegistry(r), // 关键：注册到 ETCD
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
 			ServiceName: serviceName, // 关键：设置服务名称
 		}),
 	)
-	go service.SyncDB()
 	err = svr.Run()
 
 	if err != nil {

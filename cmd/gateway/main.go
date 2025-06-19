@@ -8,9 +8,10 @@ import (
 	websock "TikTok-rpc/app/gateway/router/api/websocket"
 	"TikTok-rpc/app/gateway/rpc"
 	"TikTok-rpc/config"
+	"TikTok-rpc/pkg/base"
 	"TikTok-rpc/pkg/constants"
 	"TikTok-rpc/pkg/utils"
-
+	"context"
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
@@ -28,6 +29,13 @@ func main() {
 	if err != nil {
 		logger.Fatalf("get available port failed, err: %v", err)
 	}
+
+	p := base.TelemetryProvider(serviceName, config.Otel.CollectorAddr)
+	defer func() {
+		err := p.Shutdown(context.Background())
+		logger.Fatalf("shutdown telemetry provider failed, err: %v", err)
+	}()
+
 	h := server.New(
 		server.WithHostPorts(listenAddr),
 		server.WithHandleMethodNotAllowed(true),

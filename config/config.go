@@ -15,6 +15,7 @@ var (
 	Service      *service
 	Kafka        *kafka
 	Oss          *oss
+	Otel         *otel
 	runtimeViper = viper.New()
 )
 
@@ -53,6 +54,7 @@ func configMapping(srv string) {
 	Kafka = &c.Kafka
 	Oss = &c.OSS
 	Etcd = &c.Etcd
+	Otel = &c.Otel
 	Service = getService(srv)
 }
 
