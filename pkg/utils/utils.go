@@ -50,3 +50,18 @@ func GetAvailablePort() (string, error) {
 	}
 	return "", errors.New("utils.GetAvailablePort: not available port from config")
 }
+
+func GetPortForPprof(serviceName string) (string, error) {
+	if config.Pprof.AddrList == nil {
+		return "", errors.New("utils.GetAvailablePort: config.Pprof.AddrList is nil")
+	}
+	return config.Pprof.AddrList[m[serviceName]], nil
+}
+
+var m = map[string]int{
+	"gateway":   0,
+	"video":     1,
+	"user":      2,
+	"interact":  3,
+	"websocket": 4,
+}

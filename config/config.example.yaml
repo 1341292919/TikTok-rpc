@@ -25,6 +25,9 @@ redis:
 etcd:
   addr: 127.0.0.1:2379
 
+pprof:
+  addr: :6060
+
 services:
   gateway:
     name : gateway

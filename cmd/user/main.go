@@ -6,6 +6,7 @@ import (
 	"TikTok-rpc/kitex_gen/user/userservice"
 	"TikTok-rpc/pkg/base"
 	"TikTok-rpc/pkg/constants"
+	"TikTok-rpc/pkg/pprof"
 	"TikTok-rpc/pkg/utils"
 	"context"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
@@ -25,7 +26,8 @@ func init() {
 }
 
 func main() {
-	// 应该把etcd 以及可用的端口号 在代码中也设置管理和调配
+	pprof.Load(serviceName)
+
 	r, err := etcd.NewEtcdRegistry([]string{config.Etcd.Addr})
 	if err != nil {
 		logger.Fatalf("User: new etcd registry failed, err: %v", err)

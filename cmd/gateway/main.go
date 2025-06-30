@@ -10,6 +10,7 @@ import (
 	"TikTok-rpc/config"
 	"TikTok-rpc/pkg/base"
 	"TikTok-rpc/pkg/constants"
+	"TikTok-rpc/pkg/pprof"
 	"TikTok-rpc/pkg/utils"
 	"context"
 	"github.com/bytedance/gopkg/util/logger"
@@ -25,6 +26,7 @@ func init() {
 }
 
 func main() {
+	pprof.Load(serviceName)
 	listenAddr, err := utils.GetAvailablePort()
 	if err != nil {
 		logger.Fatalf("get available port failed, err: %v", err)
@@ -40,6 +42,7 @@ func main() {
 		server.WithHostPorts(listenAddr),
 		server.WithHandleMethodNotAllowed(true),
 	)
+
 	router.GeneratedRegister(h)
 	ws := server.Default(server.WithHostPorts("127.0.0.1:10000"))
 	ws.NoHijackConnPool = true
