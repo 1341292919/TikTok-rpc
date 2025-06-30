@@ -143,6 +143,107 @@ services:
     networks:
       - tiktok
 
+  # VictoriaMetrics 服务，时间序列数据库，存储和查询大规模时间序列数据
+  tiktok-victoriametrics:
+    container_name: tiktok-victoriametrics
+    image: victoriametrics/victoria-metrics
+    ports:
+      - "8428:8428" # 映射 HTTP 服务端口，用于通过 HTTP 协议进行数据查询、管理接口访问等操作
+      - "8089:8089" # 映射 InfluxDB 协议监听端口，支持使用 InfluxDB 协议向 VictoriaMetrics 写入数据
+      - "8089:8089/udp" # 映射 InfluxDB 协议 UDP 监听端口，支持使用 UDP 方式通过 InfluxDB 协议写入数据
+      - "2003:2003" # 映射 Graphite 协议监听端口，支持使用 Graphite 协议向 VictoriaMetrics 写入数据
+      - "2003:2003/udp" # 映射 Graphite 协议 UDP 监听端口，支持使用 UDP 方式通过 Graphite 协议写入数据
+      - "4242:4242" # 映射 OpenTSDB 协议监听端口，支持使用 OpenTSDB 协议向 VictoriaMetrics 写入数据
+    command:
+      - '--storageDataPath=/storage' # 指定 VictoriaMetrics 存储数据的路径为容器内的 /storage 目录
+      - '--graphiteListenAddr=:2003' # 设置 Graphite 协议的监听地址为 2003 端口，用于接收 Graphite 格式的指标数据
+      - '--opentsdbListenAddr=:4242' # 设置 OpenTSDB 协议的监听地址为 4242 端口，用于接收 OpenTSDB 格式的指标数据
+      - '--httpListenAddr=:8428' # 设置 HTTP 服务的监听地址为 8428 端口，可通过该端口进行数据查询、管理操作等
+      - '--influxListenAddr=:8089' # 设置 InfluxDB 协议的监听地址为 8089 端口，用于接收 InfluxDB 格式的指标数据
+    restart: always
+    networks:
+      - tiktok
+
+  # Prometheus 服务，系统监控和警报工具，收集和存储指标数据
+  tiktok-prometheus:
+    image: prom/prometheus
+    container_name: tiktok-prometheus
+    hostname: prometheus
+    volumes:
+      - ../config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../config/prometheus/mysqld_rules.yml:/etc/prometheus/mysqld_rules.yml
+      - ../config/prometheus/redis_rules.yml:/etc/prometheus/redis_rules.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - tiktok-otel-collector
+    networks:
+      - tiktok
+
+  # Node Exporter 服务，收集主机系统级指标（CPU、内存等）供 Prometheus 采集
+  tiktok-node-exporter:
+    image: quay.io/prometheus/node-exporter
+    container_name: tiktok-node-exporter
+    restart: always
+    ports:
+      - "9100:9100"
+    networks:
+      - tiktok
+
+  # cAdvisor 服务，收集容器资源使用和性能指标（CPU、内存等）
+  tiktok-cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: tiktok-cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - "8080"
+    networks:
+      - tiktok
+
+  # Redis Exporter 服务，收集 Redis 实例指标数据供 Prometheus 采集
+  tiktok-redis-exporter:
+    image: oliver006/redis_exporter
+    container_name: tiktok-redis-exporter
+    ports:
+      - "9121:9121"
+    command:
+      - "--redis.addr=redis://tiktok-redis:6379"
+    networks:
+      - tiktok
+
+  # MySQL Exporter 服务，收集 MySQL 数据库指标数据供 Prometheus 采集
+  tiktok-mysql-exporter:
+    image: prom/mysqld-exporter
+    container_name: tiktok-mysql-exporter
+    ports:
+      - "9104:9104"
+    command:
+      - "--mysqld.username=tiktok:tiktok"
+      - "--mysqld.address=tiktok-mysql:3306"
+    environment:
+      DATA_SOURCE_NAME: 'tiktok:tiktok@(tiktok-mysql:3306)/'
+    networks:
+      - tiktok
+    depends_on:
+      - tiktok-mysql
+
+  # Grafana 服务，可视化和分析平台，展示 Prometheus 等数据源的指标数据
+  tiktok-grafana:
+    container_name: tiktok-grafana
+    image: grafana/grafana:latest
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=tiktok
+      - GF_SECURITY_DISABLE_INITIAL_ADMIN_PASSWORD_HINT=true
+    ports:
+      - "3000:3000"
+    networks:
+      - tiktok
+
 networks:
   tiktok:
     driver: bridge
