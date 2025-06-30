@@ -1,0 +1,32 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['tiktok-prometheus:9090']
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['tiktok-cadvisor:8080']
+  - job_name: 'node'
+    static_configs:
+      - targets: ['tiktok-node-exporter:9100']
+  - job_name: 'redis_exporter'
+    static_configs:
+      - targets: ['tiktok-redis-exporter:9121']
+  - job_name: 'mysql_exporter'
+    static_configs:
+      - targets: ['tiktok-mysql-exporter:9104']
+  - job_name: 'otel-collector'
+    static_configs:
+      - targets: ['tiktok-otel-collector:8888']
+  - job_name: 'victoriametrics'
+    static_configs:
+      - targets: ['tiktok-victoriametrics:8428']
+
+rule_files:
+  - "mysqld_rules.yml"  # 添加这一行
+  - "redis_rules.yml"
+remote_write:
+  - url: 'http://tiktok-victoriametrics:8428/api/v1/write'
