@@ -6,6 +6,7 @@ import (
 	interactservice "TikTok-rpc/kitex_gen/interact/interactservice"
 	"TikTok-rpc/pkg/base"
 	"TikTok-rpc/pkg/constants"
+	"TikTok-rpc/pkg/pprof"
 	"TikTok-rpc/pkg/utils"
 	"context"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
@@ -25,6 +26,7 @@ func init() {
 }
 
 func main() {
+	pprof.Load(serviceName)
 	r, err := etcd.NewEtcdRegistry([]string{config.Etcd.Addr})
 	if err != nil {
 		logger.Fatalf("Interact: new etcd registry failed, err: %v", err)

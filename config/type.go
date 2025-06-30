@@ -7,6 +7,7 @@ type config struct {
 	Kafka kafka
 	Redis redis
 	Otel  otel
+	Pprof pprof
 }
 type etcd struct {
 	Addr string
@@ -36,6 +37,9 @@ type oss struct {
 	SecretKey string
 	Domain    string
 	Region    string
+}
+type pprof struct {
+	AddrList []string
 }
 
 type otel struct {

@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
@@ -15,6 +14,7 @@ var (
 	Service      *service
 	Kafka        *kafka
 	Oss          *oss
+	Pprof        *pprof
 	Otel         *otel
 	runtimeViper = viper.New()
 )
@@ -55,9 +55,16 @@ func configMapping(srv string) {
 	Oss = &c.OSS
 	Etcd = &c.Etcd
 	Otel = &c.Otel
+	Pprof = getPprof()
 	Service = getService(srv)
 }
-
+func getPprof() *pprof {
+	addrList := runtimeViper.GetStringSlice("pprof.addr")
+	p := &pprof{
+		AddrList: addrList,
+	}
+	return p
+}
 func getService(name string) *service {
 	addrList := runtimeViper.GetStringSlice("services." + name + ".addr")
 

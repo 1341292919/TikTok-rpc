@@ -109,14 +109,20 @@ func (db *websocketDB) QueryGroupMessage(ctx context.Context, req *model.ChatReq
 }
 func (db *websocketDB) UpdateMessageList(ctx context.Context, messages []*model.Message) error {
 	// 1. 获取数据库最新消息时间
-	var latestMsg Message
+	var latestMsg *Message
 	err := db.client.WithContext(ctx).
 		Table(constants.TableMessage).
 		Order("created_at DESC").
-		First(&latestMsg).
+		Find(&latestMsg).
 		Error
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "UpdateMessageList: "+err.Error())
+	}
+	if latestMsg == nil {
+		return nil
 	}
 
 	latestTime := latestMsg.CreatedAt.Unix()
