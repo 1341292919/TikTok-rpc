@@ -4,6 +4,8 @@
 ## 系统架构
 基于微服务架构，用hertz框架搭建gateway收取http请求，划分为user、video、interact和web四个核心服务，通过Gateway统一入口处理请求。服务间通过Kitex RPC框架通信，使用etcd进行服务发现。
 
+![架构图](./doc/images/architecture.svg)
+
 ## 技术栈
 
 ### 核心框架
@@ -29,6 +31,17 @@
 - **指标收集**: Prometheus
 - **数据可视化**: Grafana
 - **数据采集器**: Node Exporter, Redis Exporter, MySQL Exporter
+
+## 服务治理与链路追踪
+
+![链路追踪](./doc/images/observability.svg)
+
+**追踪流程：**
+1. Gateway 接收 HTTP 请求，生成 TraceId
+2. 通过 etcd 进行服务发现，RPC 调用携带 TraceId
+3. 服务间调用通过 Metadata 传递 TraceContext
+4. 数据上报 OTel Collector，统一处理后存储到 Jaeger/Prometheus
+5. Grafana 可视化展示追踪链和监控指标
 
 ### 基础设施
 - **容器化**: Docker + Docker Compose

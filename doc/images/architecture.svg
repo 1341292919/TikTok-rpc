@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" width="900" height="700">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#11998e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#38ef7d;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f5576c;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad5" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#fa709a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fee140;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a8edea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fed6e3;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="900" height="700" fill="#f8fafc"/>
+  
+  <!-- Title -->
+  <text x="450" y="30" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#1e293b" text-anchor="middle">TikTok 分布式视频平台架构</text>
+  
+  <!-- Layer Labels -->
+  <text x="30" y="65" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#64748b">API Gateway</text>
+  <line x1="20" y1="75" x2="880" y2="75" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4"/>
+  
+  <text x="30" y="175" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#64748b">Core Services (Kitex RPC)</text>
+  <line x1="20" y1="185" x2="880" y2="185" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4"/>
+  
+  <text x="30" y="305" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#64748b">Data Layer</text>
+  <line x1="20" y1="315" x2="880" y2="315" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4"/>
+  
+  <text x="30" y="445" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#64748b">Message Queue</text>
+  <line x1="20" y1="455" x2="880" y2="455" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4"/>
+  
+  <text x="30" y="545" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#64748b">Infrastructure / Observability</text>
+  <line x1="20" y1="555" x2="880" y2="555" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4"/>
+
+  <!-- Gateway Layer -->
+  <rect x="50" y="80" width="800" height="80" rx="8" fill="url(#grad1)" filter="url(#shadow)"/>
+  <text x="450" y="105" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">Hertz API Gateway</text>
+  <text x="450" y="125" font-family="Arial, sans-serif" font-size="11" fill="white" text-anchor="middle">HTTP/REST | Middleware | Auth | Rate Limiting</text>
+  
+  <!-- Gateway Features -->
+  <rect x="100" y="90" width="80" height="30" rx="4" fill="rgba(255,255,255,0.2)"/>
+  <text x="140" y="109" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">HTTP</text>
+  
+  <rect x="200" y="90" width="80" height="30" rx="4" fill="rgba(255,255,255,0.2)"/>
+  <text x="240" y="109" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">WebSocket</text>
+  
+  <rect x="300" y="90" width="80" height="30" rx="4" fill="rgba(255,255,255,0.2)"/>
+  <text x="340" y="109" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Auth</text>
+  
+  <rect x="400" y="90" width="80" height="30" rx="4" fill="rgba(255,255,255,0.2)"/>
+  <text x="440" y="109" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">MFA</text>
+  
+  <rect x="500" y="90" width="80" height="30" rx="4" fill="rgba(255,255,255,0.2)"/>
+  <text x="540" y="109" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Token</text>
+  
+  <rect x="600" y="90" width="80" height="30" rx="4" fill="rgba(255,255,255,0.2)"/>
+  <text x="640" y="109" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Router</text>
+  
+  <rect x="700" y="90" width="80" height="30" rx="4" fill="rgba(255,255,255,0.2)"/>
+  <text x="740" y="109" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Limit</text>
+
+  <!-- Service Discovery -->
+  <rect x="60" y="195" width="100" height="60" rx="6" fill="url(#grad6)" filter="url(#shadow)"/>
+  <text x="110" y="218" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#334155" text-anchor="middle">etcd</text>
+  <text x="110" y="233" font-family="Arial, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">Service</text>
+  <text x="110" y="244" font-family="Arial, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">Discovery</text>
+
+  <!-- Core Services -->
+  <!-- User Service -->
+  <rect x="180" y="195" width="110" height="85" rx="6" fill="url(#grad2)" filter="url(#shadow)"/>
+  <text x="235" y="218" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">User Service</text>
+  <text x="235" y="235" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Kitex RPC</text>
+  <rect x="195" y="245" width="80" height="20" rx="3" fill="rgba(255,255,255,0.2)"/>
+  <text x="235" y="258" font-family="Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">Login/Register</text>
+  
+  <!-- Video Service -->
+  <rect x="310" y="195" width="110" height="85" rx="6" fill="url(#grad3)" filter="url(#shadow)"/>
+  <text x="365" y="218" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">Video Service</text>
+  <text x="365" y="235" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Kitex RPC</text>
+  <rect x="325" y="245" width="80" height="20" rx="3" fill="rgba(255,255,255,0.2)"/>
+  <text x="365" y="258" font-family="Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">Upload/Feed</text>
+
+  <!-- Interact Service -->
+  <rect x="440" y="195" width="110" height="85" rx="6" fill="url(#grad4)" filter="url(#shadow)"/>
+  <text x="495" y="218" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">Interact Service</text>
+  <text x="495" y="235" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Kitex RPC</text>
+  <rect x="455" y="245" width="80" height="20" rx="3" fill="rgba(255,255,255,0.2)"/>
+  <text x="495" y="258" font-family="Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">Like/Comment</text>
+
+  <!-- Socialize Service -->
+  <rect x="570" y="195" width="110" height="85" rx="6" fill="url(#grad5)" filter="url(#shadow)"/>
+  <text x="625" y="218" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">Socialize Service</text>
+  <text x="625" y="235" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Kitex RPC</text>
+  <rect x="585" y="245" width="80" height="20" rx="3" fill="rgba(255,255,255,0.2)"/>
+  <text x="625" y="258" font-family="Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">Follow/Favorite</text>
+
+  <!-- WebSocket Service -->
+  <rect x="700" y="195" width="110" height="85" rx="6" fill="#6366f1" filter="url(#shadow)"/>
+  <text x="755" y="218" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">WebSocket</text>
+  <text x="755" y="235" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Kitex RPC</text>
+  <rect x="715" y="245" width="80" height="20" rx="3" fill="rgba(255,255,255,0.2)"/>
+  <text x="755" y="258" font-family="Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">Chat/Message</text>
+
+  <!-- Data Layer -->
+  <!-- MySQL -->
+  <rect x="50" y="325" width="130" height="95" rx="6" fill="url(#grad1)" filter="url(#shadow)"/>
+  <text x="115" y="355" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">MySQL 9.0</text>
+  <text x="115" y="375" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">User</text>
+  <text x="115" y="388" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Video</text>
+  <text x="115" y="401" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Interact</text>
+
+  <!-- Redis -->
+  <rect x="200" y="325" width="130" height="95" rx="6" fill="url(#grad2)" filter="url(#shadow)"/>
+  <text x="265" y="355" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">Redis</text>
+  <text x="265" y="375" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Cache</text>
+  <text x="265" y="388" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Session</text>
+  <text x="265" y="401" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Ranking</text>
+
+  <!-- OSS -->
+  <rect x="350" y="325" width="130" height="95" rx="6" fill="url(#grad3)" filter="url(#shadow)"/>
+  <text x="415" y="355" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">OSS</text>
+  <text x="415" y="375" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Video Storage</text>
+  <text x="415" y="388" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Image Storage</text>
+  <text x="415" y="401" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">CDN</text>
+
+  <!-- Message Queue -->
+  <!-- Kafka -->
+  <rect x="50" y="465" width="180" height="65" rx="6" fill="url(#grad4)" filter="url(#shadow)"/>
+  <text x="140" y="488" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">Kafka</text>
+  <text x="140" y="508" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Async Processing | Event Streaming</text>
+
+  <!-- RocketMQ -->
+  <rect x="250" y="465" width="180" height="65" rx="6" fill="url(#grad5)" filter="url(#shadow)"/>
+  <text x="340" y="488" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">RocketMQ</text>
+  <text x="340" y="508" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">Message Queue (Backup)</text>
+
+  <!-- Infrastructure / Observability -->
+  <!-- OpenTelemetry -->
+  <rect x="50" y="565" width="140" height="65" rx="6" fill="#6366f1" filter="url(#shadow)"/>
+  <text x="120" y="585" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">OpenTelemetry</text>
+  <text x="120" y="605" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Observability Framework</text>
+
+  <!-- Jaeger -->
+  <rect x="200" y="565" width="120" height="65" rx="6" fill="url(#grad6)" filter="url(#shadow)"/>
+  <text x="260" y="585" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#334155" text-anchor="middle">Jaeger</text>
+  <text x="260" y="605" font-family="Arial, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">Distributed Tracing</text>
+
+  <!-- Prometheus -->
+  <rect x="330" y="565" width="130" height="65" rx="6" fill="#eab308" filter="url(#shadow)"/>
+  <text x="395" y="585" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">Prometheus</text>
+  <text x="395" y="605" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Metrics Collection</text>
+
+  <!-- Grafana -->
+  <rect x="470" y="565" width="120" height="65" rx="6" fill="#f97316" filter="url(#shadow)"/>
+  <text x="530" y="585" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">Grafana</text>
+  <text x="530" y="605" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Visualization</text>
+
+  <!-- VictoriaMetrics -->
+  <rect x="600" y="565" width="140" height="65" rx="6" fill="#22c55e" filter="url(#shadow)"/>
+  <text x="670" y="585" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white" text-anchor="middle">VictoriaMetrics</text>
+  <text x="670" y="605" font-family="Arial, sans-serif" font-size="9" fill="white" text-anchor="middle">Time Series DB</text>
+
+  <!-- Exporters -->
+  <rect x="750" y="565" width="100" height="65" rx="6" fill="#0891b2" filter="url(#shadow)"/>
+  <text x="800" y="585" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white" text-anchor="middle">Exporters</text>
+  <text x="800" y="600" font-family="Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">Node/Redis</text>
+  <text x="800" y="612" font-family="Arial, sans-serif" font-size="8" fill="white" text-anchor="middle">MySQL</text>
+
+  <!-- Connection Lines -->
+  <!-- Gateway to Services -->
+  <line x1="450" y1="160" x2="110" y2="195" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="450" y1="160" x2="235" y2="195" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="450" y1="160" x2="365" y2="195" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="450" y1="160" x2="495" y2="195" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="450" y1="160" x2="625" y2="195" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="450" y1="160" x2="755" y2="195" stroke="#94a3b8" stroke-width="1.5"/>
+
+  <!-- Service Discovery -->
+  <line x1="110" y1="225" x2="235" y2="225" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="110" y1="225" x2="365" y2="225" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="110" y1="225" x2="495" y2="225" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="110" y1="225" x2="625" y2="225" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="110" y1="225" x2="755" y2="225" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4"/>
+
+  <!-- Services to Data Layer -->
+  <line x1="235" y1="280" x2="115" y2="325" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="235" y1="280" x2="265" y2="325" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="365" y1="280" x2="115" y2="325" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="365" y1="280" x2="265" y2="325" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="365" y1="280" x2="415" y2="325" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="495" y1="280" x2="265" y2="325" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="755" y1="280" x2="115" y2="325" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="755" y1="280" x2="265" y2="325" stroke="#94a3b8" stroke-width="1.5"/>
+
+  <!-- Services to Message Queue -->
+  <line x1="495" y1="280" x2="140" y2="465" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="495" y1="280" x2="340" y2="465" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="365" y1="280" x2="140" y2="465" stroke="#94a3b8" stroke-width="1.5"/>
+
+  <!-- Observability connections -->
+  <line x1="235" y1="280" x2="120" y2="565" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4"/>
+  <line x1="365" y1="280" x2="260" y2="565" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4"/>
+  <line x1="495" y1="280" x2="395" y2="565" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4"/>
+
+  <!-- Legend -->
+  <rect x="750" y="30" width="130" height="80" rx="4" fill="white" stroke="#e2e8f0"/>
+  <text x="815" y="45" font-family="Arial, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">Legend</text>
+  <line x1="760" y1="55" x2="780" y2="55" stroke="#667eea" stroke-width="2"/>
+  <text x="790" y="58" font-family="Arial, sans-serif" font-size="8" fill="#334155">HTTP/WS</text>
+  <line x1="760" y1="70" x2="780" y2="70" stroke="#11998e" stroke-width="2"/>
+  <text x="790" y="73" font-family="Arial, sans-serif" font-size="8" fill="#334155">RPC</text>
+  <line x1="760" y1="85" x2="780" y2="85" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4"/>
+  <text x="790" y="88" font-family="Arial, sans-serif" font-size="8" fill="#334155">Service Discovery</text>
+
+</svg>
